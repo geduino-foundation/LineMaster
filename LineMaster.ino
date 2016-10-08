@@ -21,7 +21,9 @@
 #include "Battery.h"
 #include "QTR8RC.h"
 #include "PID.h"
+#include "LowPassFilter.h"
 #include "serial_setup.h"
+
 
 // Comment/uncomment to enable/disable battery check
 //#define SKIP_BATERY_CHECK
@@ -34,6 +36,7 @@
 
 PidSetup pidSetup;
 QTR8RCSetup qtr8rcSetup;
+int lowPassFilterDim;
 
 PID pid(& pidSetup);
 
@@ -94,6 +97,7 @@ void saveSetup() {
   // Write to EEPROM
   eeprom_write_block((const void *) & pidSetup, (void *) 0, sizeof(pidSetup));
   eeprom_write_block((const void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
+  eeprom_write_block((const void *) & lowPassFilterDim, (void *) sizeof(pidSetup) + sizeof(qtr8rcSetup), sizeof(lowPassFilterDim));
 
   // Print
   Serial.println("Setup saved in EEPROM");
@@ -105,6 +109,7 @@ void loadSetup() {
   // Read from EEPROM
   eeprom_read_block((void *) & pidSetup, (void *) 0, sizeof(pidSetup));
   eeprom_read_block((void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
+  eeprom_read_block((void *) & lowPassFilterDim, (void *) sizeof(pidSetup) + sizeof(qtr8rcSetup), sizeof(lowPassFilterDim));
 
   // Print
   Serial.println("Setup loaded from EEPROM");
@@ -133,6 +138,9 @@ void serialSetup() {
   
   // Prompt QTR8RC sensor noise threshold
   serialPromptInt("Enter QTR8RC sensor noise threshold [0, 4000] range", & qtr8rcSetup.sensorNoiseThreshold);
+
+  // Prompt low pass filter dim
+  serialPromptInt("Low pass filter dimension [1, 255] range", & lowPassFilterDim);
 
   // Prompt for save
   boolean save = false;
@@ -308,17 +316,23 @@ void setup() {
 
 void loop() {
 
+  // The low pass filter
+  LowPassFilter lowPassFilter(lowPassFilterDim);
+
   boolean stopped;
-  int error, motorSx, motorDx;
+  int error, filtered, motorSx, motorDx;
    
   do {  
     
     // Read error
     qtr8rc.readError(& error);
+
+    // Filter
+    lowPassFilter.filter(error, & filtered);
   
     // Update PID controller
-    pid.update(error, & motorSx, & motorDx);
-  
+    pid.update(filtered, & motorSx, & motorDx);
+
     // Set motors speed
     motors.setSpeed(motorSx, motorDx);
     
