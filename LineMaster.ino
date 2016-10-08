@@ -21,7 +21,7 @@
 #include "Battery.h"
 #include "QTR8RC.h"
 #include "PID.h"
-#include "eeprom_anything.h"
+#include "serial_setup.h"
 
 // Comment/uncomment to enable/disable battery check
 //#define SKIP_BATERY_CHECK
@@ -33,6 +33,7 @@
 #define IR_CALIBRATION_TIME 5000
 
 PidSetup pidSetup;
+QTR8RCSetup qtr8rcSetup;
 
 PID pid(& pidSetup);
 
@@ -40,7 +41,7 @@ Motors motors(MOTOR_SX_PIN, MOTOR_DX_PIN);
 
 UI ui(LED_PIN, BUTTON_PIN);
 
-QTR8RC qtr8rc((int[]) {IR1_PIN, IR2_PIN, IR3_PIN, IR4_PIN, IR5_PIN, IR6_PIN, IR7_PIN, IR8_PIN});
+QTR8RC qtr8rc((int[]) {IR1_PIN, IR2_PIN, IR3_PIN, IR4_PIN, IR5_PIN, IR6_PIN, IR7_PIN, IR8_PIN}, & qtr8rcSetup);
 
 Battery battery(BATTERY_PIN);
 
@@ -92,6 +93,7 @@ void saveSetup() {
 
   // Write to EEPROM
   eeprom_write_block((const void *) & pidSetup, (void *) 0, sizeof(pidSetup));
+  eeprom_write_block((const void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
 
   // Print
   Serial.println("Setup saved in EEPROM");
@@ -102,6 +104,7 @@ void loadSetup() {
 
   // Read from EEPROM
   eeprom_read_block((void *) & pidSetup, (void *) 0, sizeof(pidSetup));
+  eeprom_read_block((void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
 
   // Print
   Serial.println("Setup loaded from EEPROM");
@@ -109,96 +112,39 @@ void loadSetup() {
 }
 
 void serialSetup() {
-
-  // Empty incoming serial buffer
-  while (Serial.available() > 0) {
-    Serial.read();
-  }
-
-  // Print
-  Serial.println("Entering serial setup");
-  Serial.print("Enter PID proportinal factor (");
-  Serial.print(pidSetup.proportional, 6);
-  Serial.print("): ");
-
-  // Wait data
-  while (Serial.available() == 0) {
-  }
   
-  // Parse proportinal factor
-  pidSetup.proportional = Serial.parseFloat();
+  // Prompt proportinal factor
+  serialPromptFloat("Enter PID proportional factor)", & pidSetup.proportional, 6);
 
-  // Print
-  Serial.println(pidSetup.proportional, 6);
-  Serial.print("Enter PID integrative factor (");
-  Serial.print(pidSetup.integrative, 6);
-  Serial.print("): ");
+  // Prompt integrative factor
+  serialPromptFloat("Enter PID integrative factor)", & pidSetup.integrative, 6);
 
-  // Wait data
-  while (Serial.available() == 0) {
-  }
+  // Prompt derivative factor
+  serialPromptFloat("Enter PID derivative factor)", & pidSetup.derivative, 6);
+
+  // Prompt motor max speed
+  serialPromptInt("Enter motor max speed in [-127, 128] range", & pidSetup.motorMaxSpeed);
   
-  // Parse integrative factor
-  pidSetup.integrative = Serial.parseFloat();
+  // Prompt motor max correction factor
+  serialPromptInt("Enter motor max correction in [0, 256] range", & pidSetup.motorMaxCorrection);
+
+  // Prompt QTR8RC sensor in line threshold
+  serialPromptInt("Enter QTR8RC sensor in line threshold [0, 4000] range", & qtr8rcSetup.sensorInLineThreshold);
   
-  // Print
-  Serial.println(pidSetup.integrative, 6);
-  Serial.print("Enter PID derivative factor (");
-  Serial.print(pidSetup.derivative, 6);
-  Serial.print("): ");
+  // Prompt QTR8RC sensor noise threshold
+  serialPromptInt("Enter QTR8RC sensor noise threshold [0, 4000] range", & qtr8rcSetup.sensorNoiseThreshold);
 
-  // Wait data
-  while (Serial.available() == 0) {
-  }
-  
-  // Parse derivative factor
-  pidSetup.derivative = Serial.parseFloat();
+  // Prompt for save
+  boolean save = false;
+  serialPromptYesNo("Do you want to store this setup in EEPROM", & save);
 
-  // Print
-  Serial.println(pidSetup.derivative, 6);
-  Serial.print("Enter motor max speed in [-127, 128] range (");
-  Serial.print(pidSetup.motorMaxSpeed);
-  Serial.print("): ");
-
-  // Wait data
-  while (Serial.available() == 0) {
-  }
-  
-  // Parse motor max speed factor
-  pidSetup.motorMaxSpeed = Serial.parseInt();
-
-  // Print
-  Serial.println(pidSetup.motorMaxSpeed);
-  Serial.print("Enter motor max correction in [0, 256] range (");
-  Serial.print(pidSetup.motorMaxCorrection);
-  Serial.print("): ");
-
-  // Wait data
-  while (Serial.available() == 0) {
-  }
-  
-  // Parse motor max correction factor
-  pidSetup.motorMaxCorrection = Serial.parseInt();
-
-  // Print
-  Serial.println(pidSetup.motorMaxCorrection);
-  Serial.println("Do you want to store this setup in EEPROM (y/n) ?");
-
-  // Wait data
-  while (Serial.available() == 0) {
-  }
-
-  // Read response
-  byte response = Serial.read();
-
-  if (response == 0x79 || response == 59) {
+  if (save) {
 
     // Save setup
     saveSetup();
     
   }
-  
-  
+
 }
 
 void startSetup() {
@@ -319,6 +265,7 @@ void setup() {
 
   // Init serial
   Serial.begin(9600);
+  Serial.setTimeout(1500);
 
   // Print
   Serial.println("LineMaster V1 by Geduino Foundation");

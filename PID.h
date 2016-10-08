@@ -23,7 +23,7 @@ class PID {
     };
 
     void update(int error, int * motorSx, int * motorDx);
-
+    
   private:
 
     const PidSetup * pidSetup;

@@ -1,7 +1,7 @@
 #include "Battery.h"
 
 #define BATTERY_RAW_TO_VOLT   0.009706
-#define BATTERY_MIN_VOLTS     7.0
+#define BATTERY_MIN_VOLTS     7.4
 
 boolean Battery::check(float * volts) {
 

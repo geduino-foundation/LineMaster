@@ -82,14 +82,14 @@ void QTR8RC::readError(int * error) {
 
   for (int index = 0; index < SENSORS_COUNT; index++) {
 
-    if (!inLine && values[index] > SENSOR_IN_LINE_THRESHOLD) {
+    if (!inLine && values[index] > qtr8rcSetup->sensorInLineThreshold) {
 
       // Set in line to true
       inLine = true;
       
     }
 
-    if (values[index] > SENSOR_NOISE_THRESHOLD) {
+    if (values[index] > qtr8rcSetup->sensorNoiseThreshold) {
       
       // Sum error and values
       errorSum += (long) index * SENSOR_UNIT * values[index];
