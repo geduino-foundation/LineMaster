@@ -19,20 +19,22 @@ void PID::update(int error, int * motorSx, int * motorDx) {
   // Calculate integral
   integral += error;
 
+  // Set motoir speed to max
+  * motorSx = pidSetup->motorMaxSpeed;
+  * motorDx = pidSetup->motorMaxSpeed;
+
   // Calculate correction
   int correction = error * pidSetup->proportional + derivate * pidSetup->derivative + integral * pidSetup->integrative;
 
   if (correction > 0) {
 
-    // Set motor speed
-    * motorSx = pidSetup->motorMaxSpeed;
+    // Apply correction
     * motorDx = pidSetup->motorMaxSpeed - constrain(correction, 0, pidSetup->motorMaxCorrection);
     
   } else if (correction < 0) {
 
-    // Set motor speed
+    // Apply correction
     * motorSx = pidSetup->motorMaxSpeed + constrain(correction, - pidSetup->motorMaxCorrection, 0);
-    * motorDx = pidSetup->motorMaxSpeed;
     
   }
   
