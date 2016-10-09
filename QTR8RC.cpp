@@ -176,9 +176,10 @@ void QTR8RC::readRaw(unsigned int * values) {
   }
 
   // Get start time
+  unsigned int count = 0;
   unsigned long startTime = micros();
 
-  while (micros() - startTime < SENSOR_TIMEOUT) {
+  while (micros() - startTime < SENSOR_TIMEOUT && count < SENSORS_COUNT) {
 
     // Get ellapsed time
     unsigned int ellapsedTime = micros() - startTime;
@@ -190,6 +191,9 @@ void QTR8RC::readRaw(unsigned int * values) {
 
         // Set value
         values[index] = ellapsedTime;
+
+        // Increase count
+        count++;
 
       }
 
