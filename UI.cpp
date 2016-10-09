@@ -5,16 +5,30 @@
 
 void UI::ledOn() {
 
-  // Set led to HIGH
-  digitalWrite(ledPin, HIGH);
-  
+  if (!ledOnStatus) {
+
+    // Set led to HIGH
+    digitalWrite(ledPin, HIGH);
+
+    // Set led status
+    ledOnStatus = true;
+
+  }
+
 }
 
 void UI::ledOff() {
 
-  // Set led to LOW
-  digitalWrite(ledPin, LOW);
-  
+  if (ledOnStatus) {
+
+    // Set led to LOW
+    digitalWrite(ledPin, LOW);
+
+    // Set led status
+    ledOnStatus = false;
+
+  }
+
 }
 
 
@@ -22,21 +36,21 @@ void UI::ledBlinkSlow() {
 
   // Led blink
   ledBlink(LED_BLINK_SLOW_PERIOD);
-  
+
 }
 
 void UI::ledBlinkFast() {
 
   // Led blink
   ledBlink(LED_BLINK_FAST_PERIOD);
-  
+
 }
-    
+
 void UI::button(boolean * pressed) {
 
   // Get pressed
   * pressed = digitalRead(buttonPin) == HIGH;
-  
+
 }
 
 void UI::waitButton() {
@@ -50,9 +64,9 @@ void UI::waitButton() {
 
     // Update button pressed
     button(& pressed);
-    
+
   }
-  
+
 }
 
 void UI::init() {
@@ -61,12 +75,15 @@ void UI::init() {
   pinMode(ledPin, OUTPUT);
   pinMode(buttonPin, INPUT);
 
-  // Turn led off
-  ledOff();
+  // Init led status
+  ledOnStatus = false;
+
+  // Set led to LOW
+  digitalWrite(ledPin, LOW);
 
   // Init last blink millis
   lastBlinkMillis = 0;
-  
+
 }
 
 void UI::ledBlink(const unsigned long period) {
@@ -78,11 +95,11 @@ void UI::ledBlink(const unsigned long period) {
 
     // Invert led PIN status
     digitalWrite(ledPin, !digitalRead(ledPin));
-    
+
     // Reset last blink millis
     lastBlinkMillis = now;
-    
+
   }
-  
+
 }
 

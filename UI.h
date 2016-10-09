@@ -32,6 +32,8 @@ class UI {
 
     unsigned long lastBlinkMillis;
 
+    boolean ledOnStatus;
+
     void init();
 
     void ledBlink(const unsigned long period);
