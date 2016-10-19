@@ -1,19 +1,19 @@
 /*
- LineMaster
- Copyright (C) 2016 Alessandro Francescon
- 
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License.
- 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+  LineMaster
+  Copyright (C) 2016 Alessandro Francescon
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "pinout.h"
 #include "Motors.h"
@@ -21,7 +21,6 @@
 #include "Battery.h"
 #include "QTR8RC.h"
 #include "PID.h"
-#include "LowPassFilter.h"
 #include "serial_setup.h"
 
 
@@ -34,9 +33,11 @@
 // The IR calibration time in millis
 #define IR_CALIBRATION_TIME 5000
 
+// The loop cycle duration in millis
+#define LOOP_CYCLE_DURATION 5
+
 PidSetup pidSetup;
 QTR8RCSetup qtr8rcSetup;
-int lowPassFilterDim;
 
 PID pid(& pidSetup);
 
@@ -44,7 +45,9 @@ Motors motors(MOTOR_SX_PIN, MOTOR_DX_PIN);
 
 UI ui(LED_PIN, BUTTON_PIN);
 
-QTR8RC qtr8rc((int[]) {IR1_PIN, IR2_PIN, IR3_PIN, IR4_PIN, IR5_PIN, IR6_PIN, IR7_PIN, IR8_PIN}, & qtr8rcSetup);
+QTR8RC qtr8rc((int[]) {
+  IR1_PIN, IR2_PIN, IR3_PIN, IR4_PIN, IR5_PIN, IR6_PIN, IR7_PIN, IR8_PIN
+}, & qtr8rcSetup);
 
 Battery battery(BATTERY_PIN);
 
@@ -52,7 +55,7 @@ void batteryCheck() {
 
   // Print
   Serial.print("Checking battery level... ");
-   
+
   // Check battery level
   float volts;
   boolean batteryCheckRrsult = battery.check(& volts);
@@ -81,9 +84,9 @@ void batteryCheck() {
 
       // Just for delay
       delay(100);
-      
+
     }
-    
+
   }
 #else
   // Debug
@@ -97,11 +100,10 @@ void saveSetup() {
   // Write to EEPROM
   eeprom_write_block((const void *) & pidSetup, (void *) 0, sizeof(pidSetup));
   eeprom_write_block((const void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
-  eeprom_write_block((const void *) & lowPassFilterDim, (void *) sizeof(pidSetup) + sizeof(qtr8rcSetup), sizeof(lowPassFilterDim));
 
   // Print
   Serial.println("Setup saved in EEPROM");
-  
+
 }
 
 void loadSetup() {
@@ -109,15 +111,14 @@ void loadSetup() {
   // Read from EEPROM
   eeprom_read_block((void *) & pidSetup, (void *) 0, sizeof(pidSetup));
   eeprom_read_block((void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
-  eeprom_read_block((void *) & lowPassFilterDim, (void *) sizeof(pidSetup) + sizeof(qtr8rcSetup), sizeof(lowPassFilterDim));
 
   // Print
   Serial.println("Setup loaded from EEPROM");
-  
+
 }
 
 void serialSetup() {
-  
+
   // Prompt proportinal factor
   serialPromptFloat("Enter PID proportional factor)", & pidSetup.proportional, 6);
 
@@ -129,18 +130,15 @@ void serialSetup() {
 
   // Prompt motor max speed
   serialPromptInt("Enter motor max speed in [-127, 128] range", & pidSetup.motorMaxSpeed);
-  
+
   // Prompt motor max correction factor
   serialPromptInt("Enter motor max correction in [0, 256] range", & pidSetup.motorMaxCorrection);
 
   // Prompt QTR8RC sensor in line threshold
   serialPromptInt("Enter QTR8RC sensor in line threshold [0, 4000] range", & qtr8rcSetup.sensorInLineThreshold);
-  
+
   // Prompt QTR8RC sensor noise threshold
   serialPromptInt("Enter QTR8RC sensor noise threshold [0, 4000] range", & qtr8rcSetup.sensorNoiseThreshold);
-
-  // Prompt low pass filter dim
-  serialPromptInt("Low pass filter dimension [1, 255] range", & lowPassFilterDim);
 
   // Prompt for save
   boolean save = false;
@@ -150,7 +148,7 @@ void serialSetup() {
 
     // Save setup
     saveSetup();
-    
+
   }
 
 }
@@ -166,7 +164,7 @@ void startSetup() {
   }
 
   bool enterSetup = false;
-  
+
   for (int index = 0; index < SETUP_TIMEOUT; index++) {
 
     // Wait one sec
@@ -182,9 +180,9 @@ void startSetup() {
       enterSetup = true;
 
       break;
-      
+
     }
-    
+
   }
 
   // Print
@@ -192,11 +190,11 @@ void startSetup() {
 
   if (enterSetup) {
 
-      // Serial setup
-      serialSetup();
+    // Serial setup
+    serialSetup();
 
   }
-  
+
 }
 
 void calibrate() {
@@ -229,7 +227,7 @@ void calibrate() {
 
     // Increase cycle
     cycles++;
-    
+
   }
 
   // Print
@@ -261,9 +259,9 @@ void calibrate() {
     Serial.print(minValue);
     Serial.print(" - max: ");
     Serial.println(maxValue);
-    
+
   } while (++index < count);
-  
+
 }
 
 void setup() {
@@ -278,7 +276,7 @@ void setup() {
   // Print
   Serial.println("LineMaster V1 by Geduino Foundation");
   Serial.println("Copyright (C) 2016 Alessandro Francescon");
- 
+
   // Battery check
   batteryCheck();
 
@@ -287,7 +285,7 @@ void setup() {
 
   // Setup
   startSetup();
-  
+
   // Calibration
   calibrate();
 
@@ -306,38 +304,65 @@ void setup() {
   // Debug
   Serial.println("Go Line Master go!!!");
 
-  // End serial
-  Serial.end();
-
   // Wait 500 millis to give time to... get your finger out!
   delay(500);
-  
+
 }
 
 void loop() {
 
-  // The low pass filter
-  LowPassFilter lowPassFilter(lowPassFilterDim);
+  boolean stopped, inLine;
+  unsigned int values[8];
+  int error, motorSx, motorDx;
 
-  boolean stopped;
-  int error, filtered, motorSx, motorDx;
-   
-  do {  
-    
+  long cycleTimestamp = millis(), cycleRemaining;
+
+  do {
+
     // Read error
-    qtr8rc.readError(& error);
+    qtr8rc.readError(values, & error, & inLine);
 
-    // Filter
-    lowPassFilter.filter(error, & filtered);
-  
+    if (inLine) {
+
+      // Turn led off
+      ui.ledOff();
+
+    } else {
+
+      // Turn led on
+      ui.ledOn();
+
+    }
+
     // Update PID controller
-    pid.update(filtered, & motorSx, & motorDx);
+    pid.update(error, & motorSx, & motorDx);
 
     // Set motors speed
     motors.setSpeed(motorSx, motorDx);
-    
+
     // Get stopped
     ui.button(& stopped);
+
+    // Calculate remaining time in order too meet set cycle duration
+    cycleRemaining = LOOP_CYCLE_DURATION - (millis() - cycleTimestamp);
+
+    if (cycleRemaining > 0) {
+
+      // Delat for remaining millis
+      delay(cycleRemaining);
+
+      // Turn led off
+      ui.ledOff();
+
+    } else {
+
+      // Turn led on
+      ui.ledOn();
+
+    }
+
+    // Set cycle timestamp
+    cycleTimestamp = millis();
 
   } while (!stopped);
 
@@ -351,8 +376,8 @@ void loop() {
 
     // Just for delay
     delay(500);
-    
+
   }
-  
+
 }
 

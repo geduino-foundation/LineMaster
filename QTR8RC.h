@@ -30,7 +30,7 @@ class QTR8RC {
 
     void read(unsigned int * values);
 
-    void readError(int * error);
+    void readError(unsigned int * values, int * error, boolean * inLine);
 
   private:
 

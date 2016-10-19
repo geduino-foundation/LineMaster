@@ -68,24 +68,21 @@ void QTR8RC::read(unsigned int * values) {
 
 }
 
-void QTR8RC::readError(int * error) {
-
-  // The sensor values
-  unsigned int values[SENSORS_COUNT];
+void QTR8RC::readError(unsigned int * values, int * error, boolean * inLine) {
 
   // Read
   read(values);
 
   unsigned long errorSum = 0;
   unsigned long valuesSum = 0;
-  bool inLine = false;
+  * inLine = false;
 
-  for (int index = 0; index < SENSORS_COUNT; index++) {
+  for (unsigned int index = 0; index < SENSORS_COUNT; index++) {
 
-    if (!inLine && values[index] > qtr8rcSetup->sensorInLineThreshold) {
+    if (! (* inLine) && values[index] > qtr8rcSetup->sensorInLineThreshold) {
 
       // Set in line to true
-      inLine = true;
+      * inLine = true;
       
     }
 
@@ -95,11 +92,11 @@ void QTR8RC::readError(int * error) {
       errorSum += (long) index * SENSOR_UNIT * values[index];
       valuesSum += values[index];
 
-    }
+    };
 
   }
 
-  if (inLine) {
+  if (* inLine) {
 
     // Calculate error
     * error = ((int) (errorSum / valuesSum)) - errorOffset;
