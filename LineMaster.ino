@@ -131,9 +131,6 @@ void serialSetup() {
   // Prompt motor max speed
   serialPromptInt("Enter motor max speed in [-127, 128] range", & pidSetup.motorMaxSpeed);
 
-  // Prompt motor max correction factor
-  serialPromptInt("Enter motor max correction in [0, 256] range", & pidSetup.motorMaxCorrection);
-
   // Prompt QTR8RC sensor in line threshold
   serialPromptInt("Enter QTR8RC sensor in line threshold [0, 4000] range", & qtr8rcSetup.sensorInLineThreshold);
 

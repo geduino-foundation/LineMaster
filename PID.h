@@ -8,7 +8,6 @@ struct PidSetup {
     float integrative;
     float derivative;
     int motorMaxSpeed;
-    int motorMaxCorrection;
 };
 
 class PID {
