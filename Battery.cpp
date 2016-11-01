@@ -3,7 +3,7 @@
 #define BATTERY_RAW_TO_VOLT   0.009706
 #define BATTERY_MIN_VOLTS     7.4
 
-boolean Battery::check(float * volts) {
+void Battery::readVoltage(float * volts) {
 
   int raw = 0;
   
@@ -18,9 +18,16 @@ boolean Battery::check(float * volts) {
   }
 
   // Convert to volts
-  *volts = raw / 10 * BATTERY_RAW_TO_VOLT;
+  * volts = raw / 10 * BATTERY_RAW_TO_VOLT;
+  
+}
 
-  return *volts > BATTERY_MIN_VOLTS;
+boolean Battery::check(float * volts) {
+
+  // Read voltage
+  readVoltage(volts);
+
+  return * volts > BATTERY_MIN_VOLTS;
   
 }
 

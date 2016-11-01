@@ -14,6 +14,8 @@ class Battery {
     
     };
 
+    void readVoltage(float * volts);
+
     boolean check(float * volts);
 
   private:
