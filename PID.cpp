@@ -38,12 +38,12 @@ void PID::update(int error, int * motorSx, int * motorDx) {
   if (correction > 0) {
 
     // Apply correction
-    * motorDx = constrain(motorsMaxSpeed - correction, 0, 128);
+    * motorDx = motorsMaxSpeed - correction;
     
   } else if (correction < 0) {
 
     // Apply correction
-    * motorSx = constrain(motorsMaxSpeed + correction, 0, 128);
+    * motorSx = motorsMaxSpeed + correction;
     
   }
   
