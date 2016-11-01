@@ -1,5 +1,14 @@
 #include "PID.h"
 
+void PID::setup(Settings settings) {
+
+  proportional = settings.pidProportional / 10000.0;
+  integrative = settings.pidIntegrative / 10000.0;
+  derivative = settings.pidDerivative / 10000.0;
+  motorsMaxSpeed = settings.motorsMaxSpeed;
+  
+}
+
 void PID::update(int error, int * motorSx, int * motorDx) {
 
   long derivate = 0;
@@ -20,21 +29,21 @@ void PID::update(int error, int * motorSx, int * motorDx) {
   integral += error;
 
   // Set motoir speed to max
-  * motorSx = pidSetup->motorMaxSpeed;
-  * motorDx = pidSetup->motorMaxSpeed;
+  * motorSx = motorsMaxSpeed;
+  * motorDx = motorsMaxSpeed;
 
   // Calculate correction
-  int correction = error * pidSetup->proportional + derivate * pidSetup->derivative + integral * pidSetup->integrative;
+  int correction = error * proportional + derivate * derivative + integral * integrative;
 
   if (correction > 0) {
 
     // Apply correction
-    * motorDx = constrain(pidSetup->motorMaxSpeed - correction, 0, 255);
+    * motorDx = constrain(motorsMaxSpeed - correction, 0, 128);
     
   } else if (correction < 0) {
 
     // Apply correction
-    * motorSx = constrain(pidSetup->motorMaxSpeed +correction, 0, 255);
+    * motorSx = constrain(motorsMaxSpeed + correction, 0, 128);
     
   }
   

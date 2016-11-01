@@ -3,26 +3,24 @@
 
 #include <Arduino.h>
 
+#include "settings.h"
+
 #define SENSORS_COUNT                 8
 #define SENSOR_UNIT                1000
 #define SENSOR_TIMEOUT             4000
-
-struct QTR8RCSetup {
-    int sensorInLineThreshold;
-    int sensorNoiseThreshold;
-};
 
 class QTR8RC {
 
   public:
 
-    QTR8RC(unsigned int * _irPins, const QTR8RCSetup * _qtr8rcSetup) :
-      qtr8rcSetup(_qtr8rcSetup) {
+    QTR8RC(unsigned int * _irPins) {
   
       // Initialization
       init(_irPins);
     
     };
+
+    void setup(Settings settings);
 
     void calibrate();
 
@@ -33,10 +31,11 @@ class QTR8RC {
     void readError(unsigned int * values, int * error, boolean * inLine);
 
   private:
-
+  
     const int errorOffset = (int) (SENSORS_COUNT - 1) * SENSOR_UNIT / 2;
-
-    const QTR8RCSetup * qtr8rcSetup;
+    
+    int sensorInLineThreshold;
+    int sensorNoiseThreshold;
     
     unsigned int * irPins, * minValues, * maxValues;
     int lastError;

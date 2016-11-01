@@ -21,8 +21,7 @@
 #include "Battery.h"
 #include "QTR8RC.h"
 #include "PID.h"
-#include "serial_setup.h"
-
+#include "SerialSetup.h"
 
 // Comment/uncomment to enable/disable battery check
 //#define SKIP_BATERY_CHECK
@@ -36,182 +35,38 @@
 // The loop cycle duration in millis
 #define LOOP_CYCLE_DURATION 5
 
-PidSetup pidSetup;
-QTR8RCSetup qtr8rcSetup;
+Settings settings;
 
-PID pid(& pidSetup);
+PID pid;
 
 Motors motors(MOTOR_SX_PIN, MOTOR_DX_PIN);
 
 UI ui(LED_PIN, BUTTON_PIN);
 
-QTR8RC qtr8rc((int[]) {
-  IR1_PIN, IR2_PIN, IR3_PIN, IR4_PIN, IR5_PIN, IR6_PIN, IR7_PIN, IR8_PIN
-}, & qtr8rcSetup);
+QTR8RC qtr8rc((int[]) {IR1_PIN, IR2_PIN, IR3_PIN, IR4_PIN, IR5_PIN, IR6_PIN, IR7_PIN, IR8_PIN});
 
 Battery battery(BATTERY_PIN);
 
-void batteryCheck() {
+SerialSetup serialSetup(& settings, & ui, & battery);
 
-  // Print
-  Serial.print("Checking battery level... ");
+void batteryCheck() {
 
   // Check battery level
   float volts;
   boolean batteryCheckRrsult = battery.check(& volts);
 
-  // Print
-  Serial.println("done!");
-  Serial.print("Battery level is: ");
-  Serial.print(volts);
-  Serial.println(" volt");
-
 #ifndef SKIP_BATERY_CHECK
   if (!batteryCheckRrsult) {
 
-    // Debug
-    Serial.print("Battery level is too low: ");
-    Serial.print(volts);
-    Serial.println(" volt");
-
-    // End serial
-    Serial.end();
-
-    while (true) {
-
-      // Fast blink led
-      ui.ledBlinkFast();
-
-      // Just for delay
-      delay(100);
-
-    }
+    // Fast blink led
+    ui.ledBlinkFastFor(0);
 
   }
-#else
-  // Debug
-  Serial.println("WARNING: battery level check is disabled!");
 #endif
 
 }
 
-void saveSetup() {
-
-  // Write to EEPROM
-  eeprom_write_block((const void *) & pidSetup, (void *) 0, sizeof(pidSetup));
-  eeprom_write_block((const void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
-
-  // Print
-  Serial.println("Setup saved in EEPROM");
-
-}
-
-void loadSetup() {
-
-  // Read from EEPROM
-  eeprom_read_block((void *) & pidSetup, (void *) 0, sizeof(pidSetup));
-  eeprom_read_block((void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
-
-  // Print
-  Serial.println("Setup loaded from EEPROM");
-
-}
-
-void serialSetup() {
-
-  // Prompt proportinal factor
-  serialPromptFloat("Enter PID proportional factor)", & pidSetup.proportional, 6);
-
-  // Prompt integrative factor
-  serialPromptFloat("Enter PID integrative factor)", & pidSetup.integrative, 6);
-
-  // Prompt derivative factor
-  serialPromptFloat("Enter PID derivative factor)", & pidSetup.derivative, 6);
-
-  // Prompt motor max speed
-  serialPromptInt("Enter motor max speed in [-127, 128] range", & pidSetup.motorMaxSpeed);
-
-  // Prompt QTR8RC sensor in line threshold
-  serialPromptInt("Enter QTR8RC sensor in line threshold [0, 4000] range", & qtr8rcSetup.sensorInLineThreshold);
-
-  // Prompt QTR8RC sensor noise threshold
-  serialPromptInt("Enter QTR8RC sensor noise threshold [0, 4000] range", & qtr8rcSetup.sensorNoiseThreshold);
-
-  // Prompt for save
-  boolean save = false;
-  serialPromptYesNo("Do you want to store this setup in EEPROM", & save);
-
-  if (save) {
-
-    // Save setup
-    saveSetup();
-
-  }
-
-}
-
-void startSetup() {
-
-  // Print
-  Serial.print("Press any key to start setup... ");
-
-  // Empty incoming serial buffer
-  while (Serial.available() > 0) {
-    Serial.read();
-  }
-
-  bool enterSetup = false;
-
-  for (int index = 0; index < SETUP_TIMEOUT; index++) {
-
-    // Wait one sec
-    delay(1000);
-
-    // Print
-    Serial.print(SETUP_TIMEOUT - index);
-    Serial.print("... ");
-
-    if (Serial.available() > 0) {
-
-      // Set enter setup to true
-      enterSetup = true;
-
-      break;
-
-    }
-
-  }
-
-  // Print
-  Serial.println("");
-
-  if (enterSetup) {
-
-    // Serial setup
-    serialSetup();
-
-  }
-
-}
-
 void calibrate() {
-
-  // Print
-  Serial.println("Press button to start calibration...");
-
-  // Turn led on
-  ui.ledOn();
-
-  // Wait for button
-  ui.waitButton();
-
-  // Turn led off
-  ui.ledOff();
-
-  // Print
-  Serial.print("Calibration (it will take ");
-  Serial.print(IR_CALIBRATION_TIME);
-  Serial.print(" millis)... ");
 
   // Init calibration parameters
   unsigned long calibrationStartTime = millis();
@@ -227,67 +82,42 @@ void calibrate() {
 
   }
 
-  // Print
-  Serial.println("done!");
-
-  // Calculate calibration frequency
-  float calibrationFrequency = cycles * 1000.0 / IR_CALIBRATION_TIME;
-
-  // Print
-  Serial.print("Calibration frequency: ");
-  Serial.print(calibrationFrequency, 2);
-  Serial.println(" Hz");
-
-  unsigned int minValue, maxValue;
-  int index = 0;
-  int count;
-
-  do {
-
-    // Get calibration
-    qtr8rc.getCalibration(index, & minValue, & maxValue, & count);
-
-    // Print
-    Serial.print("IR ");
-    Serial.print(index);
-    Serial.print(" of ");
-    Serial.print(count);
-    Serial.print(" - min: ");
-    Serial.print(minValue);
-    Serial.print(" - max: ");
-    Serial.println(maxValue);
-
-  } while (++index < count);
-
 }
 
 void setup() {
 
-  // Set motor PWM frequency
-  motors.setMotorPwmFrequency();
-
   // Init serial
   Serial.begin(9600);
-  Serial.setTimeout(1500);
 
-  // Print
-  Serial.println("LineMaster V1 by Geduino Foundation");
-  Serial.println("Copyright (C) 2016 Alessandro Francescon");
+  // Set motor PWM frequency
+  motors.setMotorPwmFrequency();
 
   // Battery check
   batteryCheck();
 
-  // Load setup
-  loadSetup();
+  // Turn led on
+  ui.ledOn();
 
-  // Setup
-  startSetup();
+  bool pressed;
+  do {
 
+    // Check button pressed
+    ui.button(& pressed);
+
+    // Handle serial setup
+    serialSetup.handleSerialSetup();
+    
+  } while (! pressed);
+
+  // Turn led off
+  ui.ledOff();
+
+  // Configure PID and QTR8RC
+  pid.setup(settings);
+  qtr8rc.setup(settings);
+  
   // Calibration
   calibrate();
-
-  // Print
-  Serial.println("Press button to start race... ");
 
   // Turn led on
   ui.ledOn();
@@ -297,9 +127,6 @@ void setup() {
 
   // Turn led off
   ui.ledOff();
-
-  // Debug
-  Serial.println("Go Line Master go!!!");
 
   // Wait 500 millis to give time to... get your finger out!
   delay(500);
@@ -366,15 +193,8 @@ void loop() {
   // Stop motors
   motors.stop();
 
-  while (true) {
-
-    // Fast blink led
-    ui.ledBlinkSlow();
-
-    // Just for delay
-    delay(500);
-
-  }
+  // Slow blink led
+  ui.ledBlinkSlowFor(0);
 
 }
 

@@ -3,34 +3,34 @@
 
 #include <Arduino.h>
 
-struct PidSetup {
-    float proportional;
-    float integrative;
-    float derivative;
-    int motorMaxSpeed;
-};
+#include "settings.h"
 
 class PID {
 
   public:
 
-    PID(const PidSetup * _pidSetup) : pidSetup(_pidSetup) {
+    PID() {
       
       // Initialization
       this->init();
     
     };
 
+    void setup(Settings settings);
+
     void update(int error, int * motorSx, int * motorDx);
     
   private:
 
-    const PidSetup * pidSetup;
-
-    void init();
-
+    float proportional;
+    float integrative;
+    float derivative;
+    int motorsMaxSpeed;
+    
     int lastError;
     long integral;
+    
+    void init();
   
 };
 

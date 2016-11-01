@@ -1,5 +1,12 @@
 #include "QTR8RC.h"
 
+void QTR8RC::setup(Settings settings) {
+
+   sensorInLineThreshold = settings.irInLineThreshold;
+   sensorNoiseThreshold = settings.irNoiseThreshold;
+  
+}
+
 void QTR8RC::calibrate() {
 
   // The sensor raw values
@@ -79,14 +86,14 @@ void QTR8RC::readError(unsigned int * values, int * error, boolean * inLine) {
 
   for (unsigned int index = 0; index < SENSORS_COUNT; index++) {
 
-    if (! (* inLine) && values[index] > qtr8rcSetup->sensorInLineThreshold) {
+    if (! (* inLine) && values[index] > sensorInLineThreshold) {
 
       // Set in line to true
       * inLine = true;
       
     }
 
-    if (values[index] > qtr8rcSetup->sensorNoiseThreshold) {
+    if (values[index] > sensorNoiseThreshold) {
       
       // Sum error and values
       errorSum += (long) index * SENSOR_UNIT * values[index];
