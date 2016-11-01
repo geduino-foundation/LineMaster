@@ -1,7 +1,7 @@
 #include "UI.h"
 
-#define LED_BLINK_SLOW_PERIOD   1000
-#define LED_BLINK_FAST_PERIOD   250
+#define LED_BLINK_SLOW_PERIOD   500
+#define LED_BLINK_FAST_PERIOD   125
 
 void UI::ledOn() {
 
@@ -44,6 +44,20 @@ void UI::ledBlinkFast() {
   // Led blink
   ledBlink(LED_BLINK_FAST_PERIOD);
 
+}
+
+void UI::ledBlinkSlowFor(const unsigned long duration) {
+
+  // Led blink for
+  ledBlinkFor(LED_BLINK_SLOW_PERIOD, duration);
+
+}
+
+void UI::ledBlinkFastFor(const unsigned long duration) {
+
+  // Led blink for
+  ledBlinkFor(LED_BLINK_FAST_PERIOD, duration);
+  
 }
 
 void UI::button(boolean * pressed) {
@@ -101,5 +115,23 @@ void UI::ledBlink(const unsigned long period) {
 
   }
 
+}
+
+void UI::ledBlinkFor(const unsigned long period, const unsigned long duration) {
+
+  // Get start time
+  const unsigned long start = millis();
+  
+  // White for a byte
+  while (duration == 0 || millis() - start < duration) {
+
+    // Led blink
+    ledBlink(period);
+
+    // Just wait half period
+    delay(period / 10);
+    
+  }
+  
 }
 

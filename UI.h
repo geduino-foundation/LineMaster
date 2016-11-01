@@ -22,6 +22,10 @@ class UI {
 
     void ledBlinkFast();
 
+    void ledBlinkSlowFor(const unsigned long duration);
+
+    void ledBlinkFastFor(const unsigned long duration);
+
     void button(boolean * pressed);
 
     void waitButton();
@@ -37,6 +41,8 @@ class UI {
     void init();
 
     void ledBlink(const unsigned long period);
+
+    void ledBlinkFor(const unsigned long period, const unsigned long duration);
   
 };
 
