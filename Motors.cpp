@@ -4,8 +4,8 @@
 void Motors::setSpeed(const int vSx, const int vDx) {
 
   // Calculate PWMs
-  int pwmSx = constrain(128 + vSx, 0, 255);
-  int pwmDx = constrain(128 - vDx, 0, 255);
+  byte pwmSx = constrain(128 + vSx, 0, 255);
+  byte pwmDx = constrain(128 - vDx, 0, 255);
 
   // Set PWMs
   analogWrite(motorSxPin, pwmSx);
