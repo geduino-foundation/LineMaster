@@ -17,7 +17,7 @@ class PID {
     };
 
     void setup(Settings settings);
-
+    
     void update(int error, int * correction);
     
   private:
@@ -31,6 +31,8 @@ class PID {
     long integral;
     
     void init();
+
+    void reset();
   
 };
 

@@ -42,6 +42,8 @@ class QTR8RC {
     
     void init(unsigned int * _irPins);
 
+    void reset();
+
     void readRaw(unsigned int * values);
   
 };

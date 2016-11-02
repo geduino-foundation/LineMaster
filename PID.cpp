@@ -6,6 +6,9 @@ void PID::setup(Settings settings) {
   integrative = settings.pidIntegrative / 10000.0;
   derivative = settings.pidDerivative / 10000.0;
   motorsMaxSpeed = settings.motorsMaxSpeed;
+
+  // Reset
+  reset();
   
 }
 
@@ -38,6 +41,13 @@ void PID::update(int error, int * correction) {
 
 void PID::init() {
 
+  // Reset
+  reset();
+  
+}
+
+void PID::reset() {
+
   // Init last error to NULL
   lastError = NULL;
 
@@ -45,4 +55,3 @@ void PID::init() {
   integral = 0;
   
 }
-

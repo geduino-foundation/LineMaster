@@ -49,7 +49,7 @@ Battery battery(BATTERY_PIN);
 
 SerialSetup serialSetup(& settings, & ui, & battery);
 
-void batteryCheck() {
+void doBatteryCheck() {
 
   // Check battery level
   float volts;
@@ -66,7 +66,7 @@ void batteryCheck() {
 
 }
 
-void calibrate() {
+void doCalibrate() {
 
   // Init calibration parameters
   unsigned long calibrationStartTime = millis();
@@ -84,20 +84,11 @@ void calibrate() {
 
 }
 
-void setup() {
-
-  // Init serial
-  Serial.begin(9600);
-
-  // Set motor PWM frequency
-  motors.setMotorPwmFrequency();
-
-  // Battery check
-  batteryCheck();
+void doSerialSetup() {
 
   // Turn led on
   ui.ledOn();
-
+  
   bool pressed;
   do {
 
@@ -111,32 +102,12 @@ void setup() {
 
   // Turn led off
   ui.ledOff();
-
-  // Configure PID, QTR8RC and Motors
-  pid.setup(settings);
-  qtr8rc.setup(settings);
-  motors.setup(settings);
   
-  // Calibration
-  calibrate();
-
-  // Turn led on
-  ui.ledOn();
-
-  // Wait for button
-  ui.waitButton();
-
-  // Turn led off
-  ui.ledOff();
-
-  // Wait 500 millis to give time to... get your finger out!
-  delay(500);
-
 }
 
-void loop() {
+void doRun() {
 
-  boolean stopped, inLine;
+    boolean stopped, inLine;
   unsigned int values[8];
   int error, correction;
 
@@ -190,12 +161,58 @@ void loop() {
     cycleTimestamp = millis();
 
   } while (!stopped);
+  
+}
+
+void setup() {
+
+  // Init serial
+  Serial.begin(9600);
+
+  // Set motor PWM frequency
+  motors.setMotorPwmFrequency();
+
+  // Battery check
+  doBatteryCheck();
+
+}
+
+void loop() {
+
+  // Serial setup
+  doSerialSetup();
+
+  // Configure PID, QTR8RC and Motors
+  pid.setup(settings);
+  qtr8rc.setup(settings);
+  motors.setup(settings);
+  
+  // Calibration
+  doCalibrate();
+
+  // Turn led on
+  ui.ledOn();
+
+  // Wait for button
+  ui.waitButton();
+
+  // Turn led off
+  ui.ledOff();
+
+  // Wait 500 millis to give time to... get your finger out!
+  delay(500);
+
+  // Run
+  doRun();
 
   // Stop motors
   motors.stop();
 
-  // Slow blink led
-  ui.ledBlinkSlowFor(0);
+  // Turn led on
+  ui.ledOn();
+
+  // Wait 1000 millis
+  delay(1000);
 
 }
 

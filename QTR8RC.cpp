@@ -144,6 +144,17 @@ void QTR8RC::init(unsigned int * _irPins) {
     // Set ir pin
     irPins[index] = _irPins[index];
 
+  }
+  
+  // Reset
+  reset();
+
+}
+
+void QTR8RC::reset() {
+
+  for (int index = 0; index < SENSORS_COUNT; index++) {
+
     // Set initial min and max values
     minValues[index] = SENSOR_TIMEOUT;
     maxValues[index] = 0;
@@ -152,7 +163,7 @@ void QTR8RC::init(unsigned int * _irPins) {
 
   // Set last error to zero
   lastError = 0;
-
+  
 }
 
 void QTR8RC::readRaw(unsigned int * values) {
