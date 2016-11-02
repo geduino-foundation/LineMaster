@@ -282,7 +282,7 @@ void setup() {
 
   // Setup
   startSetup();
-
+  
   // Calibration
   calibrate();
 
@@ -310,7 +310,7 @@ void loop() {
 
   boolean stopped, inLine;
   unsigned int values[8];
-  int error, motorSx, motorDx;
+  int error, correction;
 
   long cycleTimestamp = millis(), cycleRemaining;
 
@@ -332,10 +332,10 @@ void loop() {
     }
 
     // Update PID controller
-    pid.update(error, & motorSx, & motorDx);
+    pid.update(error, & correction);
 
     // Set motors speed
-    motors.setSpeed(motorSx, motorDx);
+    motors.setSpeed(correction);
 
     // Get stopped
     ui.button(& stopped);

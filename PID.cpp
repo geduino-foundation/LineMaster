@@ -1,6 +1,6 @@
 #include "PID.h"
 
-void PID::update(int error, int * motorSx, int * motorDx) {
+void PID::update(int error, int * correction) {
 
   long derivate = 0;
 
@@ -19,24 +19,8 @@ void PID::update(int error, int * motorSx, int * motorDx) {
   // Calculate integral
   integral += error;
 
-  // Set motoir speed to max
-  * motorSx = pidSetup->motorMaxSpeed;
-  * motorDx = pidSetup->motorMaxSpeed;
-
   // Calculate correction
-  int correction = error * pidSetup->proportional + derivate * pidSetup->derivative + integral * pidSetup->integrative;
-
-  if (correction > 0) {
-
-    // Apply correction
-    * motorDx -= correction;
-    
-  } else if (correction < 0) {
-
-    // Apply correction
-    * motorSx += correction;
-    
-  }
+  * correction = error * pidSetup->proportional + derivate * pidSetup->derivative + integral * pidSetup->integrative;
   
   // Set last error for next iteration
   lastError = error;

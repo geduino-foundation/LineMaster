@@ -16,14 +16,16 @@ class Motors {
     };
 
     void setMotorPwmFrequency();
-
-    void setSpeed(const int sx, const int dx);
+    
+    void setSpeed(const int correction);
 
     void stop();
 
   private:
 
     const unsigned int motorSxPin, motorDxPin;
+
+    unsigned int maxSpeed;
 
     void init();
   

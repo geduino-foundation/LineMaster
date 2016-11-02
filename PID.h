@@ -21,7 +21,7 @@ class PID {
     
     };
 
-    void update(int error, int * motorSx, int * motorDx);
+    void update(int error, int * correction);
     
   private:
 

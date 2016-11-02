@@ -1,11 +1,23 @@
 #include "Motors.h"
 #include "pwm_frequency.h";
 
-void Motors::setSpeed(const int vSx, const int vDx) {
+void Motors::setSpeed(const int correction) {
 
-  // Calculate PWMs
-  byte pwmSx = constrain(128 + vSx, 0, 255);
-  byte pwmDx = constrain(128 - vDx, 0, 255);
+  byte pwmSx, pwmDx;
+  
+  if (correction > 0) {
+
+    // Calculate PWMs
+    pwmSx = constrain(maxSpeed, 0, 255);
+    pwmDx = constrain(255 - maxSpeed + correction, 0, 255);
+    
+  } else if (correction < 0) {
+
+    // Calculate PWMs
+    pwmSx = constrain(maxSpeed + correction, 0, 255);
+    pwmDx = constrain(255 - maxSpeed, 0, 255);
+    
+  }
 
   // Set PWMs
   analogWrite(motorSxPin, pwmSx);
