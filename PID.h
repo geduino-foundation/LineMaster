@@ -18,7 +18,7 @@ class PID {
 
     void setup(Settings settings);
 
-    void update(int error, int * motorSx, int * motorDx);
+    void update(int error, int * correction);
     
   private:
 

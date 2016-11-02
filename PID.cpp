@@ -9,7 +9,7 @@ void PID::setup(Settings settings) {
   
 }
 
-void PID::update(int error, int * motorSx, int * motorDx) {
+void PID::update(int error, int * correction) {
 
   long derivate = 0;
 
@@ -28,24 +28,8 @@ void PID::update(int error, int * motorSx, int * motorDx) {
   // Calculate integral
   integral += error;
 
-  // Set motoir speed to max
-  * motorSx = motorsMaxSpeed;
-  * motorDx = motorsMaxSpeed;
-
   // Calculate correction
-  int correction = error * proportional + derivate * derivative + integral * integrative;
-
-  if (correction > 0) {
-
-    // Apply correction
-    * motorDx = motorsMaxSpeed - correction;
-    
-  } else if (correction < 0) {
-
-    // Apply correction
-    * motorSx = motorsMaxSpeed + correction;
-    
-  }
+  * correction = error * proportional + derivate * derivative + integral * integrative;
   
   // Set last error for next iteration
   lastError = error;

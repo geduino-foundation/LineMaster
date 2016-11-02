@@ -112,9 +112,10 @@ void setup() {
   // Turn led off
   ui.ledOff();
 
-  // Configure PID and QTR8RC
+  // Configure PID, QTR8RC and Motors
   pid.setup(settings);
   qtr8rc.setup(settings);
+  motors.setup(settings);
   
   // Calibration
   calibrate();
@@ -137,7 +138,7 @@ void loop() {
 
   boolean stopped, inLine;
   unsigned int values[8];
-  int error, motorSx, motorDx;
+  int error, correction;
 
   long cycleTimestamp = millis(), cycleRemaining;
 
@@ -159,10 +160,10 @@ void loop() {
     }
 
     // Update PID controller
-    pid.update(error, & motorSx, & motorDx);
+    pid.update(error, & correction);
 
     // Set motors speed
-    motors.setSpeed(motorSx, motorDx);
+    motors.setSpeed(correction);
 
     // Get stopped
     ui.button(& stopped);
