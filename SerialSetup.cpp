@@ -41,6 +41,11 @@ void SerialSetup::handleSerialSetup() {
       // Exexcute
       result = executeUpload();
       
+    } else if (cmd == DOWNLOAD_TELEMETRY) {
+
+      // Exexcute
+      result = executeDownloadTelemetry();
+      
     }
 
     if (!result) {
@@ -132,7 +137,8 @@ bool SerialSetup::executeDownload() {
   writeInt(settings->motorsMaxSpeed);
   writeInt(settings->irInLineThreshold);
   writeInt(settings->irNoiseThreshold);
-
+  writeInt(settings->telemetryEnabled);
+  
   return true;
   
 }
@@ -148,8 +154,23 @@ bool SerialSetup::executeUpload() {
   result = result && readInt(& settings->motorsMaxSpeed);
   result = result && readInt(& settings->irInLineThreshold);
   result = result && readInt(& settings->irNoiseThreshold);
+  result = result && readInt(& settings->telemetryEnabled);
 
   return result;
+  
+}
+
+bool SerialSetup::executeDownloadTelemetry() {
+
+  for (unsigned int index = 0; index < telemetry->size; index++) {
+
+    // Write data
+    writeLong(telemetry->data[index].time);
+    writeInt(telemetry->data[index].error);
+    
+  }
+
+  return true;
   
 }
 
@@ -167,6 +188,25 @@ void SerialSetup::writeInt(const unsigned int data) {
   Serial.write((byte) data);
   
 }
+
+void SerialSetup::writeInt(const int data) {
+
+  // Write data
+  Serial.write((byte) (data >> 8));
+  Serial.write((byte) data);
+  
+}
+
+void SerialSetup::writeLong(const unsigned long data) {
+
+  // Write data
+  Serial.write((byte) (data >> 24));
+  Serial.write((byte) (data >> 16));
+  Serial.write((byte) (data >> 8));
+  Serial.write((byte) data);
+  
+}
+    
 
 bool SerialSetup::readByte(byte * data, const unsigned long timeout = TIMEOUT) {
 

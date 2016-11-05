@@ -9,6 +9,7 @@ struct Settings {
   unsigned int motorsMaxSpeed;
   unsigned int irInLineThreshold;
   unsigned int irNoiseThreshold;
+  unsigned int telemetryEnabled;
     
 };
 

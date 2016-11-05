@@ -22,9 +22,10 @@
 #include "QTR8RC.h"
 #include "PID.h"
 #include "SerialSetup.h"
+#include "Telemetry.h"
 
 // Comment/uncomment to enable/disable battery check
-//#define SKIP_BATERY_CHECK
+#define SKIP_BATERY_CHECK
 
 // The setup timeout in secs
 #define SETUP_TIMEOUT 5
@@ -34,6 +35,9 @@
 
 // The loop cycle duration in millis
 #define LOOP_CYCLE_DURATION 5
+
+// The telemetry buffer size
+#define TELEMETRY_BUFFER_SIZE 200
 
 Settings settings;
 
@@ -47,7 +51,9 @@ QTR8RC qtr8rc((int[]) {IR1_PIN, IR2_PIN, IR3_PIN, IR4_PIN, IR5_PIN, IR6_PIN, IR7
 
 Battery battery(BATTERY_PIN);
 
-SerialSetup serialSetup(& settings, & ui, & battery);
+Telemetry telemetry(TELEMETRY_BUFFER_SIZE);
+
+SerialSetup serialSetup(& settings, & ui, & battery, & telemetry);
 
 void doBatteryCheck() {
 
@@ -107,16 +113,32 @@ void doSerialSetup() {
 
 void doRun() {
 
-    boolean stopped, inLine;
+  boolean stopped, inLine;
   unsigned int values[8];
   int error, correction;
 
-  long cycleTimestamp = millis(), cycleRemaining;
+  unsigned long cycleStartTime;
+  long cycleRemaining;
 
   do {
 
+    cycleStartTime = millis();
+
     // Read error
     qtr8rc.readError(values, & error, & inLine);
+
+    // Check if telemetry in enabled
+    if (settings.telemetryEnabled) {
+
+      // Add to telemetry and check if buffer is full
+      if (telemetry.add(cycleStartTime, error)) {
+
+        // Interrupt run
+        break;
+        
+      }
+      
+    }
 
     if (inLine) {
 
@@ -140,7 +162,7 @@ void doRun() {
     ui.button(& stopped);
 
     // Calculate remaining time in order too meet set cycle duration
-    cycleRemaining = LOOP_CYCLE_DURATION - (millis() - cycleTimestamp);
+    cycleRemaining = LOOP_CYCLE_DURATION - (millis() - cycleStartTime);
 
     if (cycleRemaining > 0) {
 
@@ -157,11 +179,8 @@ void doRun() {
 
     }
 
-    // Set cycle timestamp
-    cycleTimestamp = millis();
-
   } while (!stopped);
-  
+
 }
 
 void setup() {
@@ -186,6 +205,9 @@ void loop() {
   pid.setup(settings);
   qtr8rc.setup(settings);
   motors.setup(settings);
+
+  // Reset telemetry
+  telemetry.reset();
   
   // Calibration
   doCalibrate();

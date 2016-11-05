@@ -6,6 +6,7 @@
 #include "settings.h"
 #include "UI.h"
 #include "Battery.h"
+#include "Telemetry.h"
 
 #define PROTOCOL_VERSION        0x00
 
@@ -15,6 +16,7 @@
 #define SAVE_TO_EEPROM          0x03
 #define DOWNLOAD                0x04
 #define UPLOAD                  0x05
+#define DOWNLOAD_TELEMETRY      0x06
 
 #define TIMEOUT                 2500
 
@@ -22,7 +24,8 @@ class SerialSetup {
 
   public:
 
-    SerialSetup(Settings * _settings, UI * _ui, Battery * _battery) : settings(_settings), ui(_ui), battery(_battery) {
+    SerialSetup(Settings * _settings, UI * _ui, Battery * _battery, Telemetry * _telemetry) : 
+      settings(_settings), ui(_ui), battery(_battery), telemetry(_telemetry) {
       
       // Initialization
       init();
@@ -36,6 +39,7 @@ class SerialSetup {
     Settings * settings;
     UI * ui;
     Battery * battery;
+    Telemetry * telemetry;
 
     void init();
 
@@ -53,9 +57,15 @@ class SerialSetup {
 
     bool executeUpload();
 
+    bool executeDownloadTelemetry();
+
     void writeByte(const byte data);
 
     void writeInt(const unsigned int data);
+
+    void writeInt(const int data);
+
+    void writeLong(const unsigned long data);
 
     bool readByte(byte * data, const unsigned long timeout = TIMEOUT);
 
