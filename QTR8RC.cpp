@@ -10,12 +10,12 @@ void QTR8RC::setup(const Setup & setup) {
 void QTR8RC::calibrate() {
 
   // The sensor raw values
-  unsigned int values[SENSORS_COUNT];
+  uint16_t values[SENSORS_COUNT];
 
   // Read raw
   readRaw(values);
 
-  for (int index = 0; index < SENSORS_COUNT; index++) {
+  for (uint8_t index = 0; index < SENSORS_COUNT; index++) {
 
     if (values[index] < min_values[index]) {
 
@@ -33,7 +33,7 @@ void QTR8RC::calibrate() {
 
 }
 
-void QTR8RC::getCalibration(const int & index, unsigned int * min_value, unsigned int * max_value, int * count) {
+void QTR8RC::getCalibration(const int8_t & index, uint16_t * min_value, uint16_t * max_value, int8_t * count) {
 
   // Copy min and max value
   * min_value = min_values[index];
@@ -44,15 +44,15 @@ void QTR8RC::getCalibration(const int & index, unsigned int * min_value, unsigne
   
 }
 
-void QTR8RC::read(unsigned int * values) {
+void QTR8RC::read(uint16_t * values) {
 
   // The sensor raw values
-  unsigned int raw_values[SENSORS_COUNT];
+  uint16_t raw_values[SENSORS_COUNT];
 
   // Read raw
   readRaw(raw_values);
 
-  for (int index = 0; index < SENSORS_COUNT; index++) {
+  for (uint8_t index = 0; index < SENSORS_COUNT; index++) {
 
     if (raw_values[index] < min_values[index]) {
 
@@ -75,16 +75,16 @@ void QTR8RC::read(unsigned int * values) {
 
 }
 
-void QTR8RC::readError(unsigned int * values, int * error, boolean * in_line) {
+void QTR8RC::readError(uint16_t * values, int16_t * error, bool * in_line) {
 
   // Read
   read(values);
 
-  unsigned long error_sum = 0;
-  unsigned long value_sum = 0;
+  uint32_t error_sum = 0;
+  uint32_t value_sum = 0;
   * in_line = false;
 
-  for (unsigned int index = 0; index < SENSORS_COUNT; index++) {
+  for (uint8_t index = 0; index < SENSORS_COUNT; index++) {
 
     if (! (* in_line) && values[index] > ir_in_line_threshold) {
 
@@ -96,7 +96,7 @@ void QTR8RC::readError(unsigned int * values, int * error, boolean * in_line) {
     if (values[index] > ir_noise_threshold) {
       
       // Sum error and values
-      error_sum += (long) index * SENSOR_UNIT * values[index];
+      error_sum += (int32_t) index * SENSOR_UNIT * values[index];
       value_sum += values[index];
 
     };
@@ -106,7 +106,7 @@ void QTR8RC::readError(unsigned int * values, int * error, boolean * in_line) {
   if (* in_line) {
 
     // Calculate error
-    * error = ((int) (error_sum / value_sum)) - errorOffset;
+    * error = ((int16_t) (error_sum / value_sum)) - errorOffset;
     
   } else if (last_error > 0) {
 
@@ -130,16 +130,16 @@ void QTR8RC::readError(unsigned int * values, int * error, boolean * in_line) {
   
 }
 
-void QTR8RC::init(unsigned int * _ir_pins) {
+void QTR8RC::init(uint8_t * _ir_pins) {
 
   // Reserve space for ir PINs
-  ir_pins = (unsigned int *) malloc(sizeof(int) * SENSORS_COUNT);
+  ir_pins = (uint8_t *) malloc(sizeof(uint8_t) * SENSORS_COUNT);
 
   // Reserve soace for calibration data
-  min_values = (unsigned int *) malloc(sizeof(int) * SENSORS_COUNT);
-  max_values = (unsigned int *) malloc(sizeof(int) * SENSORS_COUNT);
+  min_values = (uint16_t *) malloc(sizeof(uint16_t) * SENSORS_COUNT);
+  max_values = (uint16_t *) malloc(sizeof(uint16_t) * SENSORS_COUNT);
 
-  for (int index = 0; index < SENSORS_COUNT; index++) {
+  for (uint8_t index = 0; index < SENSORS_COUNT; index++) {
 
     // Set ir pin
     ir_pins[index] = _ir_pins[index];
@@ -153,7 +153,7 @@ void QTR8RC::init(unsigned int * _ir_pins) {
 
 void QTR8RC::reset() {
 
-  for (int index = 0; index < SENSORS_COUNT; index++) {
+  for (uint8_t index = 0; index < SENSORS_COUNT; index++) {
 
     // Set initial min and max values
     min_values[index] = SENSOR_TIMEOUT;
@@ -166,9 +166,9 @@ void QTR8RC::reset() {
   
 }
 
-void QTR8RC::readRaw(unsigned int * values) {
+void QTR8RC::readRaw(uint16_t * values) {
 
-  for (int index = 0; index < SENSORS_COUNT; index++) {
+  for (uint8_t index = 0; index < SENSORS_COUNT; index++) {
 
     // Set value to max (i.e. the timeout)
     values[index] = SENSOR_TIMEOUT;
@@ -182,7 +182,7 @@ void QTR8RC::readRaw(unsigned int * values) {
   // Leave time to capacitors to charge
   delayMicroseconds(10);
 
-  for (int index = 0; index < SENSORS_COUNT; index++) {
+  for (uint8_t index = 0; index < SENSORS_COUNT; index++) {
 
     // Set ir PIN to INPUT and disable internal pull-up
     pinMode(ir_pins[index], INPUT);
@@ -191,15 +191,15 @@ void QTR8RC::readRaw(unsigned int * values) {
   }
 
   // Get start time
-  unsigned int count = 0;
-  unsigned long start_time = micros();
+  uint16_t count = 0;
+  uint32_t start_time = micros();
 
   while (micros() - start_time < SENSOR_TIMEOUT && count < SENSORS_COUNT) {
 
     // Get ellapsed time
-    unsigned int ellapsed_time = micros() - start_time;
+    uint16_t ellapsed_time = micros() - start_time;
 
-    for (int index = 0; index < SENSORS_COUNT; index++) {
+    for (uint8_t index = 0; index < SENSORS_COUNT; index++) {
 
       // Check if ir PIN is LOW (and it was not LOW before)
       if (digitalRead(ir_pins[index]) == LOW && ellapsed_time < values[index]) {

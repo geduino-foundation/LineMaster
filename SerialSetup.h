@@ -43,7 +43,7 @@ class SerialSetup {
 
     void init();
 
-    bool readCmd(byte * cmd);
+    bool readCmd(uint8_t * cmd);
   
     bool executeGetProtocolVersion();
 
@@ -59,11 +59,11 @@ class SerialSetup {
 
     bool executeDownloadTelemetry();
 
-    void writeData(const void * data, const unsigned int size);
+    void writeData(const void * data, const uint16_t size);
 
-    bool readData(const void * data, const unsigned int size, const unsigned long timeout = TIMEOUT);
+    bool readData(const void * data, const uint16_t size, const uint32_t timeout = TIMEOUT);
 
-    bool waitForData(const unsigned int count, const unsigned long timeout = TIMEOUT);
+    bool waitForData(const uint16_t count, const uint32_t timeout = TIMEOUT);
   
 };
 

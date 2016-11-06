@@ -9,7 +9,7 @@ class Motors {
 
   public:
 
-    Motors(const int _motor_sx_pin, const int _motor_dx_pin) :
+    Motors(const int8_t _motor_sx_pin, const int8_t _motor_dx_pin) :
       motor_sx_pin(_motor_sx_pin), motor_dx_pin(_motor_dx_pin) {
       
       // Initialization
@@ -21,15 +21,15 @@ class Motors {
 
     void setup(const Setup & setup);
     
-    void setSpeed(const int & correction);
+    void setSpeed(const int16_t & correction);
 
     void stop();
 
   private:
 
-    const unsigned int motor_sx_pin, motor_dx_pin;
+    const uint8_t motor_sx_pin, motor_dx_pin;
 
-    unsigned int max_speed;
+    uint8_t max_speed;
 
     void init();
   

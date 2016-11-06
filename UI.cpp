@@ -46,21 +46,21 @@ void UI::ledBlinkFast() {
 
 }
 
-void UI::ledBlinkSlowFor(const unsigned long & duration) {
+void UI::ledBlinkSlowFor(const uint32_t & duration) {
 
   // Led blink for
   ledBlinkFor(LED_BLINK_SLOW_PERIOD, duration);
 
 }
 
-void UI::ledBlinkFastFor(const unsigned long & duration) {
+void UI::ledBlinkFastFor(const uint32_t & duration) {
 
   // Led blink for
   ledBlinkFor(LED_BLINK_FAST_PERIOD, duration);
   
 }
 
-void UI::button(boolean * pressed) {
+void UI::button(bool * pressed) {
 
   // Get pressed
   * pressed = digitalRead(button_pin) == HIGH;
@@ -69,7 +69,7 @@ void UI::button(boolean * pressed) {
 
 void UI::waitButton() {
 
-  boolean pressed = false;
+  bool pressed = false;
 
   while (!pressed) {
 
@@ -100,10 +100,10 @@ void UI::init() {
 
 }
 
-void UI::ledBlink(const unsigned long & period) {
+void UI::ledBlink(const uint32_t & period) {
 
   // Get now
-  unsigned long now = millis();
+  uint32_t now = millis();
 
   if (now - last_blink_millis > period) {
 
@@ -117,10 +117,10 @@ void UI::ledBlink(const unsigned long & period) {
 
 }
 
-void UI::ledBlinkFor(const unsigned long & period, const unsigned long & duration) {
+void UI::ledBlinkFor(const uint32_t & period, const uint32_t & duration) {
 
   // Get start time
-  const unsigned long start = millis();
+  const uint32_t start = millis();
   
   // White for a byte
   while (duration == 0 || millis() - start < duration) {

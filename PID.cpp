@@ -11,9 +11,9 @@ void PID::setup(const Setup & setup) {
   
 }
 
-void PID::update(const int & error, int * correction) {
+void PID::update(const int16_t & error, int16_t * correction) {
 
-  long derivate = 0;
+  int32_t derivate = 0;
 
   if (last_error != NULL) {
 

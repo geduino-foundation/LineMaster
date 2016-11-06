@@ -5,9 +5,9 @@
 
 void Battery::readVoltage(float * volts) {
 
-  int raw = 0;
+  int16_t raw = 0;
   
-  for (int index = 0; index < 10; index++) {
+  for (uint16_t index = 0; index < 10; index++) {
     
     // Read raw value
     raw += analogRead(battery_pin);
@@ -22,7 +22,7 @@ void Battery::readVoltage(float * volts) {
   
 }
 
-boolean Battery::check(float * volts) {
+bool Battery::check(float * volts) {
 
   // Read voltage
   readVoltage(volts);

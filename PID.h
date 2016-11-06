@@ -18,7 +18,7 @@ class PID {
 
     void setup(const Setup & setup);
     
-    void update(const int & error, int * correction);
+    void update(const int16_t & error, int16_t * correction);
     
   private:
 
@@ -26,8 +26,8 @@ class PID {
     float integrative;
     float derivative;
     
-    int last_error;
-    long integral;
+    int16_t last_error;
+    int32_t integral;
     
     void init();
 

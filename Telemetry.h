@@ -9,11 +9,11 @@ class Telemetry {
 
   public:
 
-    const unsigned int size;
+    const uint16_t size;
 
     TelemetryData * data;
 
-    Telemetry(const unsigned int _size) :
+    Telemetry(const uint16_t _size) :
       size(_size) {
       
       // Initialization
@@ -23,11 +23,11 @@ class Telemetry {
 
     void reset();
 
-    bool add(const unsigned long & time, const int & error);
+    bool add(const uint32_t & time, const int16_t & error);
     
   private:
 
-    unsigned int index;
+    uint16_t index;
     
     void init();
   

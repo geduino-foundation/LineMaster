@@ -36,9 +36,9 @@
 
 #include <Arduino.h>
 
-void setPwmFrequency(const unsigned int & pin, const unsigned int & divisor) {
+void setPwmFrequency(const uint8_t & pin, const uint16_t & divisor) {
   
-  byte mode;
+  uint8_t mode;
   
   if(pin == 5 || pin == 6 || pin == 9 || pin == 10) {
   

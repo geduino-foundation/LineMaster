@@ -7,7 +7,7 @@ class Battery {
 
   public:
 
-    Battery(const unsigned int _battery_pin) :
+    Battery(const uint8_t _battery_pin) :
       battery_pin(_battery_pin) {
       
       // Initialization
@@ -17,11 +17,11 @@ class Battery {
 
     void readVoltage(float * volts);
 
-    boolean check(float * volts);
+    bool check(float * volts);
 
   private:
 
-    const unsigned int battery_pin;
+    const uint8_t battery_pin;
 
     void init();
   

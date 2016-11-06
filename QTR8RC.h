@@ -13,7 +13,7 @@ class QTR8RC {
 
   public:
 
-    QTR8RC(const unsigned int * _irPins) {
+    QTR8RC(const uint8_t * _irPins) {
   
       // Initialization
       init(_irPins);
@@ -24,27 +24,28 @@ class QTR8RC {
 
     void calibrate();
 
-    void getCalibration(const int & index, unsigned int * min_value, unsigned int * max_value, int * count);
+    void getCalibration(const int8_t & index, uint16_t * min_value, uint16_t * max_value, int8_t * count);
 
-    void read(unsigned int * values);
+    void read(uint16_t * values);
 
-    void readError(unsigned int * values, int * error, boolean * in_line);
+    void readError(uint16_t * values, int16_t * error, bool * in_line);
 
   private:
   
-    const int errorOffset = (int) (SENSORS_COUNT - 1) * SENSOR_UNIT / 2;
+    const int16_t errorOffset = (int16_t) (SENSORS_COUNT - 1) * SENSOR_UNIT / 2;
     
-    int ir_in_line_threshold;
-    int ir_noise_threshold;
+    int16_t ir_in_line_threshold;
+    int16_t ir_noise_threshold;
     
-    unsigned int * ir_pins, * min_values, * max_values;
-    int last_error;
+    uint8_t * ir_pins;
+    uint16_t * min_values, * max_values;
+    int16_t last_error;
     
-    void init(unsigned int * _ir_pins);
+    void init(uint8_t * _ir_pins);
 
     void reset();
 
-    void readRaw(unsigned int * values);
+    void readRaw(uint16_t * values);
   
 };
 

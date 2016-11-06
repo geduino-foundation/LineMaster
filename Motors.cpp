@@ -7,9 +7,9 @@ void Motors::setup(const Setup & setup) {
   
 }
 
-void Motors::setSpeed(const int & correction) {
+void Motors::setSpeed(const int16_t & correction) {
 
-  byte pwm_sx, pwm_dx;
+  uint8_t pwm_sx, pwm_dx;
   
   if (correction > 0) {
 

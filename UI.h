@@ -7,7 +7,7 @@ class UI {
 
   public:
 
-    UI(const unsigned int _led_pin, const unsigned int _button_pin) : led_pin(_led_pin), button_pin(_button_pin) {
+    UI(const uint8_t _led_pin, const uint8_t _button_pin) : led_pin(_led_pin), button_pin(_button_pin) {
       
       // Initialization
       init();
@@ -22,27 +22,27 @@ class UI {
 
     void ledBlinkFast();
 
-    void ledBlinkSlowFor(const unsigned long & duration);
+    void ledBlinkSlowFor(const uint32_t & duration);
 
-    void ledBlinkFastFor(const unsigned long & duration);
+    void ledBlinkFastFor(const uint32_t & duration);
 
-    void button(boolean * pressed);
+    void button(bool * pressed);
 
     void waitButton();
 
   private:
 
-    const unsigned int led_pin, button_pin;
+    const uint8_t led_pin, button_pin;
 
-    unsigned long last_blink_millis;
+    uint32_t last_blink_millis;
 
-    boolean led_on_status;
+    bool led_on_status;
 
     void init();
 
-    void ledBlink(const unsigned long & period);
+    void ledBlink(const uint32_t & period);
 
-    void ledBlinkFor(const unsigned long & period, const unsigned long & duration);
+    void ledBlinkFor(const uint32_t & period, const uint32_t & duration);
   
 };
 

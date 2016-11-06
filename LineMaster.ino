@@ -47,7 +47,7 @@ Motors motors(MOTOR_SX_PIN, MOTOR_DX_PIN);
 
 UI ui(LED_PIN, BUTTON_PIN);
 
-QTR8RC qtr8rc((int[]) {IR1_PIN, IR2_PIN, IR3_PIN, IR4_PIN, IR5_PIN, IR6_PIN, IR7_PIN, IR8_PIN});
+QTR8RC qtr8rc((int8_t[]) {IR1_PIN, IR2_PIN, IR3_PIN, IR4_PIN, IR5_PIN, IR6_PIN, IR7_PIN, IR8_PIN});
 
 Battery battery(BATTERY_PIN);
 
@@ -59,7 +59,7 @@ void doBatteryCheck() {
 
   // Check battery level
   float volts;
-  boolean battery_check_result = battery.check(& volts);
+  bool battery_check_result = battery.check(& volts);
 
 #ifndef SKIP_BATERY_CHECK
   if (!battery_check_result) {
@@ -75,8 +75,8 @@ void doBatteryCheck() {
 void doCalibrate() {
 
   // Init calibration parameters
-  unsigned long calibration_start_time = millis();
-  unsigned int cycles = 0;
+  uint32_t calibration_start_time = millis();
+  uint16_t cycles = 0;
 
   while (millis() - calibration_start_time < IR_CALIBRATION_TIME) {
 
@@ -152,21 +152,20 @@ void loop() {
   // Give time to move finger away...
   delay(1000);
 
-  boolean stopped, inLine;
-  unsigned int values[8];
-  int error, correction;
-
-  unsigned long cycle_start_time;
-  long cycle_remaining;
+  bool stopped, in_line;
+  uint16_t values[8];
+  int16_t error, correction;
+  uint32_t cycle_start_time;
+  int32_t cycle_remaining;
 
   do {
 
     cycle_start_time = millis();
 
     // Read error
-    qtr8rc.readError(values, & error, & inLine);
+    qtr8rc.readError(values, & error, & in_line);
 
-    if (inLine) {
+    if (in_line) {
 
       // Turn led off
       ui.ledOff();

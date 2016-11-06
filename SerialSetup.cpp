@@ -2,7 +2,7 @@
 
 void SerialSetup::handleSerialSetup() {
 
-  byte cmd;
+  uint8_t cmd;
 
   if (readCmd(& cmd)) {
 
@@ -69,13 +69,13 @@ void SerialSetup::init() {
   
 }
 
-bool SerialSetup::readCmd(byte * cmd) {
+bool SerialSetup::readCmd(uint8_t * cmd) {
 
   // Check if a byte is available
   if (Serial.available() > 0) {
 
     // Read command
-    * cmd = (unsigned byte) Serial.read();
+    * cmd = (uint8_t) Serial.read();
 
     return true;
     
@@ -88,7 +88,7 @@ bool SerialSetup::readCmd(byte * cmd) {
 bool SerialSetup::executeGetProtocolVersion() {
 
   // Get version
-  byte version = PROTOCOL_VERSION;
+  uint8_t version = PROTOCOL_VERSION;
 
   // Write protocol version
   writeData(& version, 1);
@@ -104,7 +104,7 @@ bool SerialSetup::executeGetBatteryVoltage() {
   battery->readVoltage(& volts);
 
   // Convert to millivolts
-  unsigned int millivolts = (unsigned int) (volts * 1000);
+  uint16_t millivolts = (uint16_t) (volts * 1000);
 
   // Write millivolt
   writeData(& millivolts, 2);
@@ -158,17 +158,17 @@ bool SerialSetup::executeDownloadTelemetry() {
   
 }
 
-void SerialSetup::writeData(const void * data, const unsigned int size) {
+void SerialSetup::writeData(const void * data, const uint16_t size) {
 
   // Get data pointer as byte pointer
-  byte * pointer = (byte *) data;
+  uint8_t * pointer = (uint8_t *) data;
 
   // Write to serial
   Serial.write(pointer, size);
   
 }
 
-bool SerialSetup::readData(const void * data, const unsigned int size, const unsigned long timeout = TIMEOUT) {
+bool SerialSetup::readData(const void * data, const uint16_t size, const uint32_t timeout = TIMEOUT) {
 
   // Wait for data available
   bool dataAvailable = waitForData(size);
@@ -176,7 +176,7 @@ bool SerialSetup::readData(const void * data, const unsigned int size, const uns
   if (dataAvailable) {
 
     // Get data pointer as byte pointer
-    byte * pointer = (byte *) data;
+    uint8_t * pointer = (uint8_t *) data;
 
     // Read data
     Serial.readBytes(pointer, size);
@@ -187,10 +187,10 @@ bool SerialSetup::readData(const void * data, const unsigned int size, const uns
   
 }
 
-bool SerialSetup::waitForData(const unsigned int count, const unsigned long timeout = TIMEOUT) {
+bool SerialSetup::waitForData(const uint16_t count, const uint32_t timeout = TIMEOUT) {
 
   // Get start time
-  const unsigned long start = millis();
+  const uint32_t start = millis();
   
   // White for a byte
   while (Serial.available() < count) {
