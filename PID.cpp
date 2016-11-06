@@ -1,25 +1,24 @@
 #include "PID.h"
 
-void PID::setup(Settings settings) {
+void PID::setup(const Setup & setup) {
 
-  proportional = settings.pidProportional / 10000.0;
-  integrative = settings.pidIntegrative / 10000.0;
-  derivative = settings.pidDerivative / 10000.0;
-  motorsMaxSpeed = settings.motorsMaxSpeed;
+  proportional = setup.pid_proportional / 10000.0;
+  integrative = setup.pid_integrative / 10000.0;
+  derivative = setup.pid_derivative / 10000.0;
 
   // Reset
   reset();
   
 }
 
-void PID::update(int error, int * correction) {
+void PID::update(const int & error, int * correction) {
 
   long derivate = 0;
 
-  if (lastError != NULL) {
+  if (last_error != NULL) {
 
     // Calculate derivate
-    derivate = error - lastError;
+    derivate = error - last_error;
     
   } else {
 
@@ -35,7 +34,7 @@ void PID::update(int error, int * correction) {
   * correction = error * proportional + derivate * derivative + integral * integrative;
   
   // Set last error for next iteration
-  lastError = error;
+  last_error = error;
   
 }
 
@@ -49,7 +48,7 @@ void PID::init() {
 void PID::reset() {
 
   // Init last error to NULL
-  lastError = NULL;
+  last_error = NULL;
 
   // Init integral to zero
   integral = 0;

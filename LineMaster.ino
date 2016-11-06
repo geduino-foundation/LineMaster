@@ -39,7 +39,7 @@
 // The telemetry buffer size
 #define TELEMETRY_BUFFER_SIZE 200
 
-Settings settings;
+Setup _setup;
 
 PID pid;
 
@@ -53,16 +53,16 @@ Battery battery(BATTERY_PIN);
 
 Telemetry telemetry(TELEMETRY_BUFFER_SIZE);
 
-SerialSetup serialSetup(& settings, & ui, & battery, & telemetry);
+SerialSetup serial_setup(& _setup, & ui, & battery, & telemetry);
 
 void doBatteryCheck() {
 
   // Check battery level
   float volts;
-  boolean batteryCheckRrsult = battery.check(& volts);
+  boolean battery_check_result = battery.check(& volts);
 
 #ifndef SKIP_BATERY_CHECK
-  if (!batteryCheckRrsult) {
+  if (!battery_check_result) {
 
     // Fast blink led
     ui.ledBlinkFastFor(0);
@@ -75,10 +75,10 @@ void doBatteryCheck() {
 void doCalibrate() {
 
   // Init calibration parameters
-  unsigned long calibrationStartTime = millis();
+  unsigned long calibration_start_time = millis();
   unsigned int cycles = 0;
 
-  while (millis() - calibrationStartTime < IR_CALIBRATION_TIME) {
+  while (millis() - calibration_start_time < IR_CALIBRATION_TIME) {
 
     // Calibrate QTR8RC
     qtr8rc.calibrate();
@@ -102,7 +102,7 @@ void doSerialSetup() {
     ui.button(& pressed);
 
     // Handle serial setup
-    serialSetup.handleSerialSetup();
+    serial_setup.handleSerialSetup();
     
   } while (! pressed);
 
@@ -126,9 +126,9 @@ void setup() {
   doSerialSetup();
 
   // Configure PID, QTR8RC and Motors
-  pid.setup(settings);
-  qtr8rc.setup(settings);
-  motors.setup(settings);
+  pid.setup(_setup);
+  qtr8rc.setup(_setup);
+  motors.setup(_setup);
 
   // Reset telemetry
   telemetry.reset();
@@ -156,28 +156,15 @@ void loop() {
   unsigned int values[8];
   int error, correction;
 
-  unsigned long cycleStartTime;
-  long cycleRemaining;
+  unsigned long cycle_start_time;
+  long cycle_remaining;
 
   do {
 
-    cycleStartTime = millis();
+    cycle_start_time = millis();
 
     // Read error
     qtr8rc.readError(values, & error, & inLine);
-
-    // Check if telemetry in enabled
-    if (settings.telemetryEnabled) {
-
-      // Add to telemetry and check if buffer is full
-      if (telemetry.add(cycleStartTime, error)) {
-
-        // Interrupt run
-        break;
-        
-      }
-      
-    }
 
     if (inLine) {
 
@@ -194,6 +181,19 @@ void loop() {
     // Update PID controller
     pid.update(error, & correction);
 
+    // Check if telemetry in enabled
+    if (_setup.telemetry_enabled) {
+
+      // Add to telemetry and check if buffer is full
+      if (telemetry.add(cycle_start_time, error)) {
+
+        // Interrupt run
+        break;
+        
+      }
+      
+    }
+    
     // Set motors speed
     motors.setSpeed(correction);
 
@@ -201,12 +201,12 @@ void loop() {
     ui.button(& stopped);
 
     // Calculate remaining time in order too meet set cycle duration
-    cycleRemaining = LOOP_CYCLE_DURATION - (millis() - cycleStartTime);
+    cycle_remaining = LOOP_CYCLE_DURATION - (millis() - cycle_start_time);
 
-    if (cycleRemaining > 0) {
+    if (cycle_remaining > 0) {
 
       // Delat for remaining millis
-      delay(cycleRemaining);
+      delay(cycle_remaining);
 
       // Turn led off
       ui.ledOff();
@@ -233,9 +233,9 @@ void loop() {
   doSerialSetup();
 
   // Configure PID, QTR8RC and Motors
-  pid.setup(settings);
-  qtr8rc.setup(settings);
-  motors.setup(settings);
+  pid.setup(_setup);
+  qtr8rc.setup(_setup);
+  motors.setup(_setup);
 
 }
 

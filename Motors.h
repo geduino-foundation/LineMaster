@@ -3,14 +3,14 @@
 
 #include <Arduino.h>
 
-#include "SerialSetup.h"
+#include "types.h"
 
 class Motors {
 
   public:
 
-    Motors(const int _motorSxPin, const int _motorDxPin) :
-      motorSxPin(_motorSxPin), motorDxPin(_motorDxPin) {
+    Motors(const int _motor_sx_pin, const int _motor_dx_pin) :
+      motor_sx_pin(_motor_sx_pin), motor_dx_pin(_motor_dx_pin) {
       
       // Initialization
       this->init();
@@ -19,17 +19,17 @@ class Motors {
 
     void setMotorPwmFrequency();
 
-    void setup(Settings settings);
+    void setup(const Setup & setup);
     
-    void setSpeed(const int correction);
+    void setSpeed(const int & correction);
 
     void stop();
 
   private:
 
-    const unsigned int motorSxPin, motorDxPin;
+    const unsigned int motor_sx_pin, motor_dx_pin;
 
-    unsigned int maxSpeed;
+    unsigned int max_speed;
 
     void init();
   

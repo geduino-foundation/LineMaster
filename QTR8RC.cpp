@@ -1,9 +1,9 @@
 #include "QTR8RC.h"
 
-void QTR8RC::setup(Settings settings) {
+void QTR8RC::setup(const Setup & setup) {
 
-   sensorInLineThreshold = settings.irInLineThreshold;
-   sensorNoiseThreshold = settings.irNoiseThreshold;
+   ir_in_line_threshold = setup.ir_in_line_threshold;
+   ir_noise_threshold = setup.ir_noise_threshold;
   
 }
 
@@ -17,15 +17,15 @@ void QTR8RC::calibrate() {
 
   for (int index = 0; index < SENSORS_COUNT; index++) {
 
-    if (values[index] < minValues[index]) {
+    if (values[index] < min_values[index]) {
 
       // Set new min value
-      minValues[index] = values[index];
+      min_values[index] = values[index];
 
-    } else if (values[index] > maxValues[index]) {
+    } else if (values[index] > max_values[index]) {
 
       // Set new max value
-      maxValues[index] = values[index];
+      max_values[index] = values[index];
 
     }
 
@@ -33,11 +33,11 @@ void QTR8RC::calibrate() {
 
 }
 
-void QTR8RC::getCalibration(int index, unsigned int * minValue, unsigned int * maxValue, int * count) {
+void QTR8RC::getCalibration(const int & index, unsigned int * min_value, unsigned int * max_value, int * count) {
 
   // Copy min and max value
-  * minValue = minValues[index];
-  * maxValue = maxValues[index];
+  * min_value = min_values[index];
+  * max_value = max_values[index];
     
   // Set count
   * count = SENSORS_COUNT;
@@ -47,19 +47,19 @@ void QTR8RC::getCalibration(int index, unsigned int * minValue, unsigned int * m
 void QTR8RC::read(unsigned int * values) {
 
   // The sensor raw values
-  unsigned int rawValues[SENSORS_COUNT];
+  unsigned int raw_values[SENSORS_COUNT];
 
   // Read raw
-  readRaw(rawValues);
+  readRaw(raw_values);
 
   for (int index = 0; index < SENSORS_COUNT; index++) {
 
-    if (rawValues[index] < minValues[index]) {
+    if (raw_values[index] < min_values[index]) {
 
       // Value under min: set 0
       values[index] = 0;
 
-    } else if (rawValues[index] > maxValues[index]) {
+    } else if (raw_values[index] > max_values[index]) {
 
       // Value over max: set timeout
       values[index] = SENSOR_TIMEOUT;
@@ -67,7 +67,7 @@ void QTR8RC::read(unsigned int * values) {
     } else {
 
       // Map value betwen 0 and timeout
-      values[index] = map(rawValues[index], minValues[index], maxValues[index], 0, SENSOR_TIMEOUT);
+      values[index] = map(raw_values[index], min_values[index], max_values[index], 0, SENSOR_TIMEOUT);
 
     }
     
@@ -75,45 +75,45 @@ void QTR8RC::read(unsigned int * values) {
 
 }
 
-void QTR8RC::readError(unsigned int * values, int * error, boolean * inLine) {
+void QTR8RC::readError(unsigned int * values, int * error, boolean * in_line) {
 
   // Read
   read(values);
 
-  unsigned long errorSum = 0;
-  unsigned long valuesSum = 0;
-  * inLine = false;
+  unsigned long error_sum = 0;
+  unsigned long value_sum = 0;
+  * in_line = false;
 
   for (unsigned int index = 0; index < SENSORS_COUNT; index++) {
 
-    if (! (* inLine) && values[index] > sensorInLineThreshold) {
+    if (! (* in_line) && values[index] > ir_in_line_threshold) {
 
       // Set in line to true
-      * inLine = true;
+      * in_line = true;
       
     }
 
-    if (values[index] > sensorNoiseThreshold) {
+    if (values[index] > ir_noise_threshold) {
       
       // Sum error and values
-      errorSum += (long) index * SENSOR_UNIT * values[index];
-      valuesSum += values[index];
+      error_sum += (long) index * SENSOR_UNIT * values[index];
+      value_sum += values[index];
 
     };
 
   }
 
-  if (* inLine) {
+  if (* in_line) {
 
     // Calculate error
-    * error = ((int) (errorSum / valuesSum)) - errorOffset;
+    * error = ((int) (error_sum / value_sum)) - errorOffset;
     
-  } else if (lastError > 0) {
+  } else if (last_error > 0) {
 
     // Calculate error
     * error = errorOffset;
     
-  } else if (lastError < 0) {
+  } else if (last_error < 0) {
 
     // Calculate error
     * error = - errorOffset;
@@ -126,23 +126,23 @@ void QTR8RC::readError(unsigned int * values, int * error, boolean * inLine) {
   }
     
   // Set last error for next iteration
-  lastError = * error;
+  last_error = * error;
   
 }
 
-void QTR8RC::init(unsigned int * _irPins) {
+void QTR8RC::init(unsigned int * _ir_pins) {
 
   // Reserve space for ir PINs
-  irPins = (unsigned int *) malloc(sizeof(int) * SENSORS_COUNT);
+  ir_pins = (unsigned int *) malloc(sizeof(int) * SENSORS_COUNT);
 
   // Reserve soace for calibration data
-  minValues = (unsigned int *) malloc(sizeof(int) * SENSORS_COUNT);
-  maxValues = (unsigned int *) malloc(sizeof(int) * SENSORS_COUNT);
+  min_values = (unsigned int *) malloc(sizeof(int) * SENSORS_COUNT);
+  max_values = (unsigned int *) malloc(sizeof(int) * SENSORS_COUNT);
 
   for (int index = 0; index < SENSORS_COUNT; index++) {
 
     // Set ir pin
-    irPins[index] = _irPins[index];
+    ir_pins[index] = _ir_pins[index];
 
   }
   
@@ -156,13 +156,13 @@ void QTR8RC::reset() {
   for (int index = 0; index < SENSORS_COUNT; index++) {
 
     // Set initial min and max values
-    minValues[index] = SENSOR_TIMEOUT;
-    maxValues[index] = 0;
+    min_values[index] = SENSOR_TIMEOUT;
+    max_values[index] = 0;
 
   }
 
   // Set last error to zero
-  lastError = 0;
+  last_error = 0;
   
 }
 
@@ -174,8 +174,8 @@ void QTR8RC::readRaw(unsigned int * values) {
     values[index] = SENSOR_TIMEOUT;
 
     // Set ir PIN to OUTPUT and drive it HIGH
-    pinMode(irPins[index], OUTPUT);
-    digitalWrite(irPins[index], HIGH);
+    pinMode(ir_pins[index], OUTPUT);
+    digitalWrite(ir_pins[index], HIGH);
 
   }
 
@@ -185,27 +185,27 @@ void QTR8RC::readRaw(unsigned int * values) {
   for (int index = 0; index < SENSORS_COUNT; index++) {
 
     // Set ir PIN to INPUT and disable internal pull-up
-    pinMode(irPins[index], INPUT);
-    digitalWrite(irPins[index], LOW);
+    pinMode(ir_pins[index], INPUT);
+    digitalWrite(ir_pins[index], LOW);
 
   }
 
   // Get start time
   unsigned int count = 0;
-  unsigned long startTime = micros();
+  unsigned long start_time = micros();
 
-  while (micros() - startTime < SENSOR_TIMEOUT && count < SENSORS_COUNT) {
+  while (micros() - start_time < SENSOR_TIMEOUT && count < SENSORS_COUNT) {
 
     // Get ellapsed time
-    unsigned int ellapsedTime = micros() - startTime;
+    unsigned int ellapsed_time = micros() - start_time;
 
     for (int index = 0; index < SENSORS_COUNT; index++) {
 
       // Check if ir PIN is LOW (and it was not LOW before)
-      if (digitalRead(irPins[index]) == LOW && ellapsedTime < values[index]) {
+      if (digitalRead(ir_pins[index]) == LOW && ellapsed_time < values[index]) {
 
         // Set value
-        values[index] = ellapsedTime;
+        values[index] = ellapsed_time;
 
         // Increase count
         count++;

@@ -6,6 +6,7 @@
 #include "UI.h"
 #include "Battery.h"
 #include "Telemetry.h"
+#include "types.h"
 
 #define PROTOCOL_VERSION        0x00
 
@@ -19,24 +20,12 @@
 
 #define TIMEOUT                 2500
 
-struct __attribute__((packed)) Settings {
-
-  unsigned int pidProportional;
-  unsigned int pidIntegrative;
-  unsigned int pidDerivative;
-  unsigned int motorsMaxSpeed;
-  unsigned int irInLineThreshold;
-  unsigned int irNoiseThreshold;
-  unsigned int telemetryEnabled;
-    
-};
-
 class SerialSetup {
 
   public:
 
-    SerialSetup(Settings * _settings, UI * _ui, Battery * _battery, Telemetry * _telemetry) : 
-      settings(_settings), ui(_ui), battery(_battery), telemetry(_telemetry) {
+    SerialSetup(Setup * _setup, UI * _ui, Battery * _battery, Telemetry * _telemetry) : 
+      setup(_setup), ui(_ui), battery(_battery), telemetry(_telemetry) {
       
       // Initialization
       init();
@@ -47,7 +36,7 @@ class SerialSetup {
 
   private:
 
-    Settings * settings;
+    Setup * setup;
     UI * ui;
     Battery * battery;
     Telemetry * telemetry;

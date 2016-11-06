@@ -7,7 +7,8 @@ class Battery {
 
   public:
 
-    Battery(const unsigned int _batteryPin) : batteryPin(_batteryPin) {
+    Battery(const unsigned int _battery_pin) :
+      battery_pin(_battery_pin) {
       
       // Initialization
       init();
@@ -20,7 +21,7 @@ class Battery {
 
   private:
 
-    const unsigned int batteryPin;
+    const unsigned int battery_pin;
 
     void init();
   

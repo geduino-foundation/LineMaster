@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#include "SerialSetup.h"
+#include "types.h"
 
 class PID {
 
@@ -16,18 +16,17 @@ class PID {
     
     };
 
-    void setup(Settings settings);
+    void setup(const Setup & setup);
     
-    void update(int error, int * correction);
+    void update(const int & error, int * correction);
     
   private:
 
     float proportional;
     float integrative;
     float derivative;
-    int motorsMaxSpeed;
     
-    int lastError;
+    int last_error;
     long integral;
     
     void init();

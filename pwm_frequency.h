@@ -36,7 +36,7 @@
 
 #include <Arduino.h>
 
-void setPwmFrequency(int pin, int divisor) {
+void setPwmFrequency(const unsigned int & pin, const unsigned int & divisor) {
   
   byte mode;
   

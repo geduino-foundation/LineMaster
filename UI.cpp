@@ -5,13 +5,13 @@
 
 void UI::ledOn() {
 
-  if (!ledOnStatus) {
+  if (!led_on_status) {
 
     // Set led to HIGH
-    digitalWrite(ledPin, HIGH);
+    digitalWrite(led_pin, HIGH);
 
     // Set led status
-    ledOnStatus = true;
+    led_on_status = true;
 
   }
 
@@ -19,13 +19,13 @@ void UI::ledOn() {
 
 void UI::ledOff() {
 
-  if (ledOnStatus) {
+  if (led_on_status) {
 
     // Set led to LOW
-    digitalWrite(ledPin, LOW);
+    digitalWrite(led_pin, LOW);
 
     // Set led status
-    ledOnStatus = false;
+    led_on_status = false;
 
   }
 
@@ -46,14 +46,14 @@ void UI::ledBlinkFast() {
 
 }
 
-void UI::ledBlinkSlowFor(const unsigned long duration) {
+void UI::ledBlinkSlowFor(const unsigned long & duration) {
 
   // Led blink for
   ledBlinkFor(LED_BLINK_SLOW_PERIOD, duration);
 
 }
 
-void UI::ledBlinkFastFor(const unsigned long duration) {
+void UI::ledBlinkFastFor(const unsigned long & duration) {
 
   // Led blink for
   ledBlinkFor(LED_BLINK_FAST_PERIOD, duration);
@@ -63,7 +63,7 @@ void UI::ledBlinkFastFor(const unsigned long duration) {
 void UI::button(boolean * pressed) {
 
   // Get pressed
-  * pressed = digitalRead(buttonPin) == HIGH;
+  * pressed = digitalRead(button_pin) == HIGH;
 
 }
 
@@ -86,38 +86,38 @@ void UI::waitButton() {
 void UI::init() {
 
   // Set motor PINs to OUTPUT
-  pinMode(ledPin, OUTPUT);
-  pinMode(buttonPin, INPUT);
+  pinMode(led_pin, OUTPUT);
+  pinMode(button_pin, INPUT);
 
   // Init led status
-  ledOnStatus = false;
+  led_on_status = false;
 
   // Set led to LOW
-  digitalWrite(ledPin, LOW);
+  digitalWrite(led_pin, LOW);
 
   // Init last blink millis
-  lastBlinkMillis = 0;
+  last_blink_millis = 0;
 
 }
 
-void UI::ledBlink(const unsigned long period) {
+void UI::ledBlink(const unsigned long & period) {
 
   // Get now
   unsigned long now = millis();
 
-  if (now - lastBlinkMillis > period) {
+  if (now - last_blink_millis > period) {
 
     // Invert led PIN status
-    digitalWrite(ledPin, !digitalRead(ledPin));
+    digitalWrite(led_pin, !digitalRead(led_pin));
 
     // Reset last blink millis
-    lastBlinkMillis = now;
+    last_blink_millis = now;
 
   }
 
 }
 
-void UI::ledBlinkFor(const unsigned long period, const unsigned long duration) {
+void UI::ledBlinkFor(const unsigned long & period, const unsigned long & duration) {
 
   // Get start time
   const unsigned long start = millis();

@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#include "SerialSetup.h"
+#include "types.h"
 
 #define SENSORS_COUNT                 8
 #define SENSOR_UNIT                1000
@@ -13,34 +13,34 @@ class QTR8RC {
 
   public:
 
-    QTR8RC(unsigned int * _irPins) {
+    QTR8RC(const unsigned int * _irPins) {
   
       // Initialization
       init(_irPins);
     
     };
 
-    void setup(Settings settings);
+    void setup(const Setup & setup);
 
     void calibrate();
 
-    void getCalibration(int index, unsigned int * minValue, unsigned int * maxValue, int * count);
+    void getCalibration(const int & index, unsigned int * min_value, unsigned int * max_value, int * count);
 
     void read(unsigned int * values);
 
-    void readError(unsigned int * values, int * error, boolean * inLine);
+    void readError(unsigned int * values, int * error, boolean * in_line);
 
   private:
   
     const int errorOffset = (int) (SENSORS_COUNT - 1) * SENSOR_UNIT / 2;
     
-    int sensorInLineThreshold;
-    int sensorNoiseThreshold;
+    int ir_in_line_threshold;
+    int ir_noise_threshold;
     
-    unsigned int * irPins, * minValues, * maxValues;
-    int lastError;
+    unsigned int * ir_pins, * min_values, * max_values;
+    int last_error;
     
-    void init(unsigned int * _irPins);
+    void init(unsigned int * _ir_pins);
 
     void reset();
 

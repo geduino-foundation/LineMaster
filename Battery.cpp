@@ -10,7 +10,7 @@ void Battery::readVoltage(float * volts) {
   for (int index = 0; index < 10; index++) {
     
     // Read raw value
-    raw += analogRead(batteryPin);
+    raw += analogRead(battery_pin);
 
     // Just wait for stabilization
     delay(50);
@@ -34,7 +34,7 @@ boolean Battery::check(float * volts) {
 void Battery::init() {
 
   // Set battery PIN to INPUT
-  pinMode(batteryPin, INPUT);
+  pinMode(battery_pin, INPUT);
   
 }
 

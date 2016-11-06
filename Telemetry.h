@@ -3,12 +3,7 @@
 
 #include <Arduino.h>
 
-struct __attribute__((packed)) TelemetryData {
-  
-  unsigned long time;
-  int error;
-    
-};
+#include "types.h"
 
 class Telemetry {
 
@@ -19,7 +14,7 @@ class Telemetry {
     TelemetryData * data;
 
     Telemetry(const unsigned int _size) :
-    size(_size) {
+      size(_size) {
       
       // Initialization
       this->init();
@@ -28,7 +23,7 @@ class Telemetry {
 
     void reset();
 
-    bool add(const unsigned long time, const int error);
+    bool add(const unsigned long & time, const int & error);
     
   private:
 

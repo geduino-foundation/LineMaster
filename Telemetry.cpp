@@ -10,15 +10,11 @@ void Telemetry::reset() {
   
 }
  
-bool Telemetry::add(const unsigned long time, const int error) {
-
-  // Create telemtry data
-  TelemetryData telemetryData;
-  telemetryData.time = time;
-  telemetryData.error = error;
+bool Telemetry::add(const unsigned long & time, const int & error) {
 
   // Put into data
-  data[index++] = telemetryData;
+  data[index++].time = time;
+  data[index++].error = error;
 
   if (index == size) {
 

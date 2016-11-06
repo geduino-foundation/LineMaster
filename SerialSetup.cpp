@@ -116,7 +116,7 @@ bool SerialSetup::executeGetBatteryVoltage() {
 bool SerialSetup::executeSaveToEEPROM() {
 
   // Write to EEPROM
-  eeprom_write_block((const void *) settings, (void *) 0, sizeof(* settings));
+  eeprom_write_block((const void *) setup, (void *) 0, sizeof(* setup));
 
   return true;
   
@@ -125,7 +125,7 @@ bool SerialSetup::executeSaveToEEPROM() {
 bool SerialSetup::executeLoadFromEEPROM() {
 
   // Read from EEPROM
-  eeprom_read_block((void *) settings, (void *) 0, sizeof(* settings));
+  eeprom_read_block((void *) setup, (void *) 0, sizeof(* setup));
 
   return true;
   
@@ -134,7 +134,7 @@ bool SerialSetup::executeLoadFromEEPROM() {
 bool SerialSetup::executeDownload() {
 
   // Write data
-  writeData(settings, sizeof(Settings));
+  writeData(setup, sizeof(Setup));
   
   return true;
   
@@ -143,7 +143,7 @@ bool SerialSetup::executeDownload() {
 bool SerialSetup::executeUpload() {
 
   // Read data
-  bool result = readData(settings, sizeof(Settings));
+  bool result = readData(setup, sizeof(Setup));
 
   return result;
   
