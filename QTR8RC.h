@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#include "settings.h"
+#include "SerialSetup.h"
 
 #define SENSORS_COUNT                 8
 #define SENSOR_UNIT                1000

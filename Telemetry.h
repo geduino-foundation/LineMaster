@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-struct TelemetryData {
+struct __attribute__((packed)) TelemetryData {
   
   unsigned long time;
   int error;

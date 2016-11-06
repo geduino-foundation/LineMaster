@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#include "settings.h"
+#include "SerialSetup.h"
 
 class PID {
 

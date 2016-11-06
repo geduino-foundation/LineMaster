@@ -87,8 +87,11 @@ bool SerialSetup::readCmd(byte * cmd) {
   
 bool SerialSetup::executeGetProtocolVersion() {
 
+  // Get version
+  byte version = PROTOCOL_VERSION;
+
   // Write protocol version
-  writeByte((unsigned byte) PROTOCOL_VERSION);
+  writeData(& version, 1);
 
   return true;
   
@@ -104,7 +107,7 @@ bool SerialSetup::executeGetBatteryVoltage() {
   unsigned int millivolts = (unsigned int) (volts * 1000);
 
   // Write millivolt
-  writeInt(millivolts);
+  writeData(& millivolts, 2);
 
   return true;
   
@@ -131,13 +134,7 @@ bool SerialSetup::executeLoadFromEEPROM() {
 bool SerialSetup::executeDownload() {
 
   // Write data
-  writeInt(settings->pidProportional);
-  writeInt(settings->pidIntegrative);
-  writeInt(settings->pidDerivative);
-  writeInt(settings->motorsMaxSpeed);
-  writeInt(settings->irInLineThreshold);
-  writeInt(settings->irNoiseThreshold);
-  writeInt(settings->telemetryEnabled);
+  writeData(settings, sizeof(Settings));
   
   return true;
   
@@ -145,16 +142,8 @@ bool SerialSetup::executeDownload() {
 
 bool SerialSetup::executeUpload() {
 
-  bool result = true;
-  
   // Read data
-  result = result && readInt(& settings->pidProportional);
-  result = result && readInt(& settings->pidIntegrative);
-  result = result && readInt(& settings->pidDerivative);
-  result = result && readInt(& settings->motorsMaxSpeed);
-  result = result && readInt(& settings->irInLineThreshold);
-  result = result && readInt(& settings->irNoiseThreshold);
-  result = result && readInt(& settings->telemetryEnabled);
+  bool result = readData(settings, sizeof(Settings));
 
   return result;
   
@@ -162,78 +151,36 @@ bool SerialSetup::executeUpload() {
 
 bool SerialSetup::executeDownloadTelemetry() {
 
-  for (unsigned int index = 0; index < telemetry->size; index++) {
-
-    // Write data
-    writeLong(telemetry->data[index].time);
-    writeInt(telemetry->data[index].error);
-    
-  }
+  // Write data
+  writeData(telemetry->data, sizeof(TelemetryData) * telemetry->size);
 
   return true;
   
 }
 
-void SerialSetup::writeByte(const byte data) {
+void SerialSetup::writeData(const void * data, const unsigned int size) {
 
-  // Write data
-  Serial.write(data);
+  // Get data pointer as byte pointer
+  byte * pointer = (byte *) data;
+
+  // Write to serial
+  Serial.write(pointer, size);
   
 }
 
-void SerialSetup::writeInt(const unsigned int data) {
+bool SerialSetup::readData(const void * data, const unsigned int size, const unsigned long timeout = TIMEOUT) {
 
-  // Write data
-  Serial.write((byte) (data >> 8));
-  Serial.write((byte) data);
-  
-}
-
-void SerialSetup::writeInt(const int data) {
-
-  // Write data
-  Serial.write((byte) (data >> 8));
-  Serial.write((byte) data);
-  
-}
-
-void SerialSetup::writeLong(const unsigned long data) {
-
-  // Write data
-  Serial.write((byte) (data >> 24));
-  Serial.write((byte) (data >> 16));
-  Serial.write((byte) (data >> 8));
-  Serial.write((byte) data);
-  
-}
-    
-
-bool SerialSetup::readByte(byte * data, const unsigned long timeout = TIMEOUT) {
-
-  bool dataAvailable = waitForData(1);
+  // Wait for data available
+  bool dataAvailable = waitForData(size);
 
   if (dataAvailable) {
 
-    // Read data
-    * data = Serial.read();
-    
-  }
-
-  return dataAvailable;
-  
-}
-
-bool SerialSetup::readInt(unsigned int * data, const unsigned long timeout = TIMEOUT) {
-
-  bool dataAvailable = waitForData(2);
-
-  if (dataAvailable) {
+    // Get data pointer as byte pointer
+    byte * pointer = (byte *) data;
 
     // Read data
-    * data = Serial.read();
-    * data <<= 8;
-    * data += Serial.read();
-    
+    Serial.readBytes(pointer, size);
+
   }
 
   return dataAvailable;

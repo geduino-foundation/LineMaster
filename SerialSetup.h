@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 
-#include "settings.h"
 #include "UI.h"
 #include "Battery.h"
 #include "Telemetry.h"
@@ -19,6 +18,18 @@
 #define DOWNLOAD_TELEMETRY      0x06
 
 #define TIMEOUT                 2500
+
+struct __attribute__((packed)) Settings {
+
+  unsigned int pidProportional;
+  unsigned int pidIntegrative;
+  unsigned int pidDerivative;
+  unsigned int motorsMaxSpeed;
+  unsigned int irInLineThreshold;
+  unsigned int irNoiseThreshold;
+  unsigned int telemetryEnabled;
+    
+};
 
 class SerialSetup {
 
@@ -59,17 +70,9 @@ class SerialSetup {
 
     bool executeDownloadTelemetry();
 
-    void writeByte(const byte data);
+    void writeData(const void * data, const unsigned int size);
 
-    void writeInt(const unsigned int data);
-
-    void writeInt(const int data);
-
-    void writeLong(const unsigned long data);
-
-    bool readByte(byte * data, const unsigned long timeout = TIMEOUT);
-
-    bool readInt(unsigned int * data, const unsigned long timeout = TIMEOUT);
+    bool readData(const void * data, const unsigned int size, const unsigned long timeout = TIMEOUT);
 
     bool waitForData(const unsigned int count, const unsigned long timeout = TIMEOUT);
   
