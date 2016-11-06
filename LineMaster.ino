@@ -25,7 +25,7 @@
 #include "Telemetry.h"
 
 // Comment/uncomment to enable/disable battery check
-#define SKIP_BATERY_CHECK
+//#define SKIP_BATERY_CHECK
 
 // The setup timeout in secs
 #define SETUP_TIMEOUT 5
@@ -111,7 +111,46 @@ void doSerialSetup() {
   
 }
 
-void doRun() {
+void setup() {
+
+  // Init serial
+  Serial.begin(9600);
+
+  // Set motor PWM frequency
+  motors.setMotorPwmFrequency();
+
+  // Battery check
+  doBatteryCheck();
+  
+  // Serial setup
+  doSerialSetup();
+
+  // Configure PID, QTR8RC and Motors
+  pid.setup(settings);
+  qtr8rc.setup(settings);
+  motors.setup(settings);
+
+  // Reset telemetry
+  telemetry.reset();
+  
+  // Calibration
+  doCalibrate();
+  
+}
+
+void loop() {
+
+   // Turn led on
+  ui.ledOn();
+
+  // Wait for button
+  ui.waitButton();
+
+  // Turn led off
+  ui.ledOff();
+
+  // Give time to move finger away...
+  delay(1000);
 
   boolean stopped, inLine;
   unsigned int values[8];
@@ -181,22 +220,14 @@ void doRun() {
 
   } while (!stopped);
 
-}
+  // Stop motors
+  motors.stop();
 
-void setup() {
+  // Turn led off
+  ui.ledOff();
 
-  // Init serial
-  Serial.begin(9600);
-
-  // Set motor PWM frequency
-  motors.setMotorPwmFrequency();
-
-  // Battery check
-  doBatteryCheck();
-
-}
-
-void loop() {
+  // Give time to move finger away...
+  delay(1000);
 
   // Serial setup
   doSerialSetup();
@@ -205,36 +236,6 @@ void loop() {
   pid.setup(settings);
   qtr8rc.setup(settings);
   motors.setup(settings);
-
-  // Reset telemetry
-  telemetry.reset();
-  
-  // Calibration
-  doCalibrate();
-
-  // Turn led on
-  ui.ledOn();
-
-  // Wait for button
-  ui.waitButton();
-
-  // Turn led off
-  ui.ledOff();
-
-  // Wait 500 millis to give time to... get your finger out!
-  delay(500);
-
-  // Run
-  doRun();
-
-  // Stop motors
-  motors.stop();
-
-  // Turn led on
-  ui.ledOn();
-
-  // Wait 1000 millis
-  delay(1000);
 
 }
 
