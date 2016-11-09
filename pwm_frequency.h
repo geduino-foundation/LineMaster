@@ -1,7 +1,15 @@
+/** 
+ * Thanks to macegr of the Arduino forums for his documentation of the
+ * PWM frequency divisors. His post can be viewed at:
+ *   http://forum.arduino.cc/index.php?topic=16612#msg121031
+ */
+ 
 #ifndef _PWM_FREQUENCY_H_
 #define _PWM_FREQUENCY_H_
 
-/**
+#include <Arduino.h>
+
+/*
  * Divides a given PWM pin frequency by a divisor.
  * 
  * The resulting frequency is equal to the base frequency divided by
@@ -28,14 +36,7 @@
  *     functions may also be affected.
  *   - Changes on pins 9 or 10 will cause the Servo library to function
  *     incorrectly.
- * 
- * Thanks to macegr of the Arduino forums for his documentation of the
- * PWM frequency divisors. His post can be viewed at:
- *   http://forum.arduino.cc/index.php?topic=16612#msg121031
  */
-
-#include <Arduino.h>
-
 void setPwmFrequency(const uint8_t & pin, const uint16_t & divisor) {
   
   uint8_t mode;
