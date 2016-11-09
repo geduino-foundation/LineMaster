@@ -12,6 +12,10 @@ struct __attribute__((packed)) Setup {
     uint16_t pid_proportional;
     uint16_t pid_integrative;
     uint16_t pid_derivative;
+    uint16_t pid_max_proportional;
+    uint16_t pid_max_integrative;
+    uint16_t pid_max_derivative; 
+    uint16_t pid_max_correction;
     uint16_t motors_max_speed;
     uint16_t ir_in_line_threshold;
     uint16_t ir_noise_threshold;
