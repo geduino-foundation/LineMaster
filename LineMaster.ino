@@ -129,7 +129,7 @@ void serialSetup() {
   serialPromptFloat("Enter PID derivative factor)", & pidSetup.derivative, 6);
 
   // Prompt motor max speed
-  serialPromptInt("Enter motor max speed in [-127, 128] range", & pidSetup.motorMaxSpeed);
+  serialPromptInt("Enter motor max speed in [0, 255] range", & pidSetup.motorMaxSpeed);
 
   // Prompt QTR8RC sensor in line threshold
   serialPromptInt("Enter QTR8RC sensor in line threshold [0, 4000] range", & qtr8rcSetup.sensorInLineThreshold);
