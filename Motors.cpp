@@ -8,14 +8,20 @@ void Motors::setSpeed(const int correction) {
   if (correction > 0) {
 
     // Calculate PWMs
-    pwmSx = constrain(maxSpeed, 0, 255);
-    pwmDx = constrain(255 - maxSpeed + correction, 0, 255);
+    pwmSx = constrain(255 - maxSpeed, 0, 255);
+    pwmDx = constrain(maxSpeed - correction, 0, 255);
     
   } else if (correction < 0) {
 
     // Calculate PWMs
-    pwmSx = constrain(maxSpeed + correction, 0, 255);
-    pwmDx = constrain(255 - maxSpeed, 0, 255);
+    pwmSx = constrain(255 - maxSpeed + correction, 0, 255);
+    pwmDx = constrain(maxSpeed, 0, 255);
+    
+  } else {
+
+    // Calculate PWMs
+    pwmSx = 255 - maxSpeed;
+    pwmDx = maxSpeed;
     
   }
 
