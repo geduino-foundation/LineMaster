@@ -19,9 +19,14 @@ void PID::update(int error, int * correction) {
   // Calculate integral
   integral += error;
 
-  // Calculate correction
-  * correction = error * pidSetup->proportional + derivate * pidSetup->derivative + integral * pidSetup->integrative;
+  // Calculate proportional, integrative and derivative correction
+  int proportionalCorrection = constrain(error * pidSetup->proportional, - pidSetup->maxProportional, pidSetup->maxProportional);
+  int integrativeCorrection = constrain(integral * pidSetup->integrative, - pidSetup->maxIntegrative, pidSetup->maxIntegrative);
+  int derivativeCorrection = constrain(derivate * pidSetup->derivative, - pidSetup->maxDerivative, pidSetup->maxDerivative);
   
+  // Calculate correction
+  * correction = constrain(proportionalCorrection + integrativeCorrection + derivativeCorrection, - pidSetup->maxCorrection, pidSetup->maxCorrection);
+ 
   // Set last error for next iteration
   lastError = error;
   

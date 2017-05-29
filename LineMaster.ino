@@ -121,15 +121,18 @@ void serialSetup() {
 
   // Prompt proportinal factor
   serialPromptFloat("Enter PID proportional factor)", & pidSetup.proportional, 6);
+  serialPromptInt("Enter PID proportional max correction)", & pidSetup.maxProportional);
 
   // Prompt integrative factor
   serialPromptFloat("Enter PID integrative factor)", & pidSetup.integrative, 6);
+  serialPromptInt("Enter PID integrative max correction)", & pidSetup.maxIntegrative);
 
   // Prompt derivative factor
   serialPromptFloat("Enter PID derivative factor)", & pidSetup.derivative, 6);
+  serialPromptInt("Enter PID derivative max correction)", & pidSetup.maxDerivative);
 
-  // Prompt motor max speed
-  serialPromptInt("Enter motor max speed in [0, 255] range", & pidSetup.motorMaxSpeed);
+  // Prompt max correction
+  serialPromptInt("Enter PID overall max correction)", & pidSetup.maxCorrection);
 
   // Prompt QTR8RC sensor in line threshold
   serialPromptInt("Enter QTR8RC sensor in line threshold [0, 4000] range", & qtr8rcSetup.sensorInLineThreshold);
