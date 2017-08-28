@@ -42,8 +42,6 @@ class Motors {
 
     const unsigned int motorSxPin, motorDxPin;
 
-    unsigned int maxSpeed;
-
     void init();
   
 };
