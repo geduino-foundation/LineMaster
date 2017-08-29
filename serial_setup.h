@@ -75,6 +75,29 @@ void serialPromptInt(const char * prompt, int * value) {
   
 }
 
+void serialPromptByte(const char * prompt, byte * value) {
+
+  // Empty serial
+  emptySerial();
+
+  // Prompt
+  Serial.print(prompt);
+  Serial.print(" (");
+  Serial.print(* value);
+  Serial.print("): ");
+
+  // Wait data
+  while (Serial.available() == 0) {
+  }
+  
+  // Parse received serial bytes
+  * value = (byte) Serial.parseInt();
+
+  // Print
+  Serial.println(* value);
+  
+}
+
 void serialPromptYesNo(const char * prompt, boolean * value) {
 
   // Empty serial

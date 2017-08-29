@@ -25,26 +25,26 @@ void Motors::setSpeed(const int correction) {
   if (correction > 0) {
 
     // Calculate PWMs
-    pwmSx = constrain(255, 0, 255);
-    pwmDx = constrain(correction, 0, 255);
+    pwmSx = constrain(motorsSetup->normalSpeed + correction, 0, motorsSetup->maxSpeed);
+    pwmDx = constrain(pwmSx - correction, 0, motorsSetup->maxSpeed);
     
   } else if (correction < 0) {
 
     // Calculate PWMs
-    pwmSx = constrain(255 + correction, 0, 255);
-    pwmDx = constrain(0, 0, 255);
+    pwmDx = constrain(motorsSetup->normalSpeed - correction, 0, motorsSetup->maxSpeed);
+    pwmSx = constrain(pwmDx + correction, 0, motorsSetup->maxSpeed);
     
   } else {
 
     // Calculate PWMs
-    pwmSx = 255;
-    pwmDx = 0;
+    pwmSx = motorsSetup->normalSpeed;
+    pwmDx = motorsSetup->normalSpeed;
     
   }
 
   // Set PWMs
   analogWrite(motorSxPin, pwmSx);
-  analogWrite(motorDxPin, pwmDx);
+  analogWrite(motorDxPin, 255 - pwmDx);
   
 }
 

@@ -20,12 +20,17 @@
 
 #include <Arduino.h>
 
+struct MotorsSetup {
+    byte normalSpeed;
+    byte maxSpeed;
+};
+
 class Motors {
 
   public:
 
-    Motors(const int _motorSxPin, const int _motorDxPin) :
-      motorSxPin(_motorSxPin), motorDxPin(_motorDxPin) {
+    Motors(const int _motorSxPin, const int _motorDxPin, const MotorsSetup * _motorsSetup) :
+      motorSxPin(_motorSxPin), motorDxPin(_motorDxPin), motorsSetup(_motorsSetup) {
       
       // Initialization
       this->init();
@@ -39,6 +44,8 @@ class Motors {
     void stop();
 
   private:
+
+    const MotorsSetup * motorsSetup;
 
     const unsigned int motorSxPin, motorDxPin;
 

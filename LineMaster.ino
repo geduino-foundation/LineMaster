@@ -38,10 +38,11 @@
 
 PidSetup pidSetup;
 QTR8RCSetup qtr8rcSetup;
+MotorsSetup motorsSetup;
 
 PID pid(& pidSetup);
 
-Motors motors(MOTOR_SX_PIN, MOTOR_DX_PIN);
+Motors motors(MOTOR_SX_PIN, MOTOR_DX_PIN, & motorsSetup);
 
 UI ui(LED_PIN, BUTTON_PIN);
 
@@ -98,8 +99,12 @@ void batteryCheck() {
 void saveSetup() {
 
   // Write to EEPROM
-  eeprom_write_block((const void *) & pidSetup, (void *) 0, sizeof(pidSetup));
-  eeprom_write_block((const void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
+  unsigned int offset = 0;
+  eeprom_write_block((const void *) & pidSetup, (void *) offset, sizeof(pidSetup));
+  offset += sizeof(pidSetup);
+  eeprom_write_block((const void *) & qtr8rcSetup, (void *) offset, sizeof(qtr8rcSetup));
+  offset += sizeof(qtr8rcSetup);
+  eeprom_write_block((const void *) & motorsSetup, (void *) offset , sizeof(motorsSetup));
 
   // Print
   Serial.println("Setup saved in EEPROM");
@@ -109,8 +114,12 @@ void saveSetup() {
 void loadSetup() {
 
   // Read from EEPROM
-  eeprom_read_block((void *) & pidSetup, (void *) 0, sizeof(pidSetup));
-  eeprom_read_block((void *) & qtr8rcSetup, (void *) sizeof(pidSetup), sizeof(qtr8rcSetup));
+  unsigned int offset = 0;
+  eeprom_read_block((void *) & pidSetup, (void *) offset, sizeof(pidSetup));
+  offset += sizeof(pidSetup);
+  eeprom_read_block((void *) & qtr8rcSetup, (void *) offset, sizeof(qtr8rcSetup));
+  offset += sizeof(qtr8rcSetup);
+  eeprom_read_block((void *) & motorsSetup, (void *) offset, sizeof(motorsSetup));
 
   // Print
   Serial.println("Setup loaded from EEPROM");
@@ -139,6 +148,12 @@ void serialSetup() {
 
   // Prompt QTR8RC sensor noise threshold
   serialPromptInt("Enter QTR8RC sensor noise threshold [0, 4000] range", & qtr8rcSetup.sensorNoiseThreshold);
+
+  // Prompt motors normal speed
+  serialPromptByte("Enter motors normal speed [0, 255] range", & motorsSetup.normalSpeed);
+
+  // Prompt motors max speed
+  serialPromptByte("Enter motors max speed [0, 255] range", & motorsSetup.maxSpeed);
 
   // Prompt for save
   boolean save = false;
