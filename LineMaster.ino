@@ -75,9 +75,6 @@ void batteryCheck() {
     Serial.print(volts);
     Serial.println(" volt");
 
-    // End serial
-    Serial.end();
-
     while (true) {
 
       // Fast blink led
