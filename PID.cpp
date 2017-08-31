@@ -19,20 +19,19 @@
 
 void PID::update(int error, int * correction) {
 
+  // Get current micros
+  unsigned long currentMicros = micros();
+
+  // Set derivate to zero
   long derivate = 0;
 
   if (lastError != NULL) {
 
     // Calculate derivate
-    derivate = error - lastError;
-    
-  } else {
-
-    // Set derivate to zero
-    derivate = 0;
+    derivate = ((error - lastError) * 1000000) / ((int) (currentMicros - lastMicros));
     
   }
-
+  
   // Calculate integral
   integral += error;
 
@@ -40,11 +39,12 @@ void PID::update(int error, int * correction) {
   int proportionalCorrection = constrain(error * pidSetup->proportional, - pidSetup->maxProportional, pidSetup->maxProportional);
   int integrativeCorrection = constrain(integral * pidSetup->integrative, - pidSetup->maxIntegrative, pidSetup->maxIntegrative);
   int derivativeCorrection = constrain(derivate * pidSetup->derivative, - pidSetup->maxDerivative, pidSetup->maxDerivative);
-  
+
   // Calculate correction
   * correction = constrain(proportionalCorrection + integrativeCorrection + derivativeCorrection, - pidSetup->maxCorrection, pidSetup->maxCorrection);
- 
-  // Set last error for next iteration
+
+  // Set last micros and last error for next iteration
+  lastMicros = currentMicros;
   lastError = error;
   
 }

@@ -49,6 +49,7 @@ class PID {
 
     void init();
 
+    unsigned long lastMicros;
     int lastError;
     long integral;
   

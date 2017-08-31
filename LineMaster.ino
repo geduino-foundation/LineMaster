@@ -33,9 +33,6 @@
 // The IR calibration time in millis
 #define IR_CALIBRATION_TIME 5000
 
-// The loop cycle duration in millis
-#define LOOP_CYCLE_DURATION 5
-
 PidSetup pidSetup;
 QTR8RCSetup qtr8rcSetup;
 MotorsSetup motorsSetup;
@@ -102,7 +99,7 @@ void saveSetup() {
   eeprom_write_block((const void *) & qtr8rcSetup, (void *) offset, sizeof(qtr8rcSetup));
   offset += sizeof(qtr8rcSetup);
   eeprom_write_block((const void *) & motorsSetup, (void *) offset , sizeof(motorsSetup));
-
+  
   // Print
   Serial.println("Setup saved in EEPROM");
 
@@ -117,7 +114,7 @@ void loadSetup() {
   eeprom_read_block((void *) & qtr8rcSetup, (void *) offset, sizeof(qtr8rcSetup));
   offset += sizeof(qtr8rcSetup);
   eeprom_read_block((void *) & motorsSetup, (void *) offset, sizeof(motorsSetup));
-
+  
   // Print
   Serial.println("Setup loaded from EEPROM");
 
@@ -155,7 +152,7 @@ void serialSetup() {
   // Prompt for save
   boolean save = false;
   serialPromptYesNo("Do you want to store this setup in EEPROM", & save);
-
+  
   if (save) {
 
     // Save setup
@@ -327,8 +324,6 @@ void loop() {
   unsigned int values[8];
   int error, correction;
 
-  long cycleTimestamp = millis(), cycleRemaining;
-
   do {
 
     // Read error
@@ -354,27 +349,6 @@ void loop() {
 
     // Get stopped
     ui.button(& stopped);
-
-    // Calculate remaining time in order too meet set cycle duration
-    cycleRemaining = LOOP_CYCLE_DURATION - (millis() - cycleTimestamp);
-
-    if (cycleRemaining > 0) {
-
-      // Delat for remaining millis
-      delay(cycleRemaining);
-
-      // Turn led off
-      ui.ledOff();
-
-    } else {
-
-      // Turn led on
-      ui.ledOn();
-
-    }
-
-    // Set cycle timestamp
-    cycleTimestamp = millis();
 
   } while (!stopped);
 
